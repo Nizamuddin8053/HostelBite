@@ -13,7 +13,7 @@ const SignupForm = () => {
         role: "",
         room_number: "",
         staffRole: "",
-        salary_amount: "",
+        
     });
 
     const handleChange = (e) => {
@@ -181,19 +181,7 @@ const SignupForm = () => {
                             />
                         </div>
 
-                        <div>
-                            <label className="block mb-1 text-gray-600 font-medium">
-                                Salary Amount
-                            </label>
-                            <input
-                                type="number"
-                                name="salary_amount"
-                                value={formData.salary_amount}
-                                onChange={handleChange}
-                                placeholder="Enter salary amount"
-                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                            />
-                        </div>
+                       
                     </>
                 )}
 

@@ -97,8 +97,8 @@ export default function Contact() {
                                 <div>
                                     <h4 className="font-semibold text-gray-800">Address</h4>
                                     <p className="text-gray-600">
-                                        HostelBite HQ, Tech Park Avenue,
-                                        Pune, Maharashtra, India - 411001
+                                        HostelBite HQ, Maulana Azad National Institute of Technology,
+                                        Bhopal, Madhya Pradesh, India
                                     </p>
                                 </div>
                             </div>
