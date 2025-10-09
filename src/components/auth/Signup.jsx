@@ -42,7 +42,7 @@ const SignupForm = () => {
         try {
             // Adjust the API URL based on your backend
             const response = await axios.post(
-                "http://localhost:5000/api/auth/signup",
+                "http://localhost:4000/api/auth/signup",
                 formData
             );
 

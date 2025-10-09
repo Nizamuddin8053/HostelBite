@@ -28,7 +28,7 @@ const LoginForm = () => {
 
         try {
             const response = await axios.post(
-                "http://localhost:5000/api/auth/login",
+                "http://localhost:4000/api/auth/login",
                 {
                     email: formData.email,
                     password: formData.password,
@@ -48,7 +48,18 @@ const LoginForm = () => {
             localStorage.setItem("token", response.data.token);
             localStorage.setItem("role", response.data.role);
             alert("Login successful!");
-            navigate("/dashboard");
+            
+
+            // navigate to respective dashboard based on role
+            if (response.data.role === "student") {
+                navigate("/student-dashboard");
+            } else if (response.data.role === "admin") {
+                navigate("/admin-dashboard");
+            } else if (response.data.role === "staff") {
+                navigate("/staff-dashboard");
+            } else {
+                navigate("/");
+            }
 
 
         } catch (error) {
