@@ -1,7 +1,10 @@
 import React from "react";
 import { Utensils, Users, Heart, Lightbulb, Star, Mail } from "lucide-react";
 import nizam from '../../assets/nizam.jpg';
-
+import abhijeet from '../../assets/Abhijeet.jpg';
+import amarjeet from "../../assets/amarjeet.jpeg";
+import pooja from "../../assets/Pooja.png";
+import meer from "../../assets/meer.png";
 const About =()=> {
     return (
         <div className="min-h-screen bg-gray-50 font-sans text-gray-800 flex flex-col">
@@ -120,19 +123,19 @@ const About =()=> {
 
                     <div className="text-center">
                         <img
-                            src="https://images.unsplash.com/photo-1595152772835-219674b2a8a6?auto=format&fit=crop&w=800&q=60"
+                            src={abhijeet}
                             alt="Team member"
                             className="w-40 h-40 object-cover rounded-full mx-auto mb-4 shadow-lg"
                         />
                         <h4 className="font-semibold text-lg text-gray-800">Abhijeet Soni</h4>
-                        <p className="text-sm text-gray-600">UI/UX Designer & Frontend Developer</p>
+                        <p className="text-sm text-gray-600">Database Designer & Frontend Developer</p>
                     </div>
 
                     {/* Amarjeet Kumar */}
 
                     <div className="text-center">
                         <img
-                            src="https://images.unsplash.com/photo-1595152772835-219674b2a8a6?auto=format&fit=crop&w=800&q=60"
+                            src={amarjeet}
                             alt="Team member"
                             className="w-40 h-40 object-cover rounded-full mx-auto mb-4 shadow-lg"
                         />
@@ -144,19 +147,19 @@ const About =()=> {
 
                     <div className="text-center">
                         <img
-                            src="https://images.unsplash.com/photo-1595152772835-219674b2a8a6?auto=format&fit=crop&w=800&q=60"
+                            src={meer}
                             alt="Team member"
                             className="w-40 h-40 object-cover rounded-full mx-auto mb-4 shadow-lg"
                         />
                         <h4 className="font-semibold text-lg text-gray-800">Meer Samad Khan</h4>
-                        <p className="text-sm text-gray-600">Database Designer</p>
+                        <p className="text-sm text-gray-600">UI/UX Designer</p>
                     </div>
 
                     {/* Pooja Prusty */}
 
                     <div className="text-center">
                         <img
-                            src="https://images.unsplash.com/photo-1595152772835-219674b2a8a6?auto=format&fit=crop&w=800&q=60"
+                            src={pooja}
                             alt="Team member"
                             className="w-40 h-40 object-cover rounded-full mx-auto mb-4 shadow-lg"
                         />

@@ -34,7 +34,7 @@ const Home = () => {
                     {/* Veg Section */}
                     <div className="rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300">
                         <img
-                            src="https://images.pexels.com/photos/9419194/pexels-photo-9419194.jpeg"
+                            src="https://images.pexels.com/photos/10345736/pexels-photo-10345736.jpeg"
                             alt="Veg Meal"
                             className="w-full h-60 object-cover"
                         />
