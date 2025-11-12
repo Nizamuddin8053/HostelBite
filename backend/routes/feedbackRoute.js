@@ -13,7 +13,7 @@ const router = express.Router();
 router.post("/", createFeedback);
 
 // Get all feedback
-router.get("/", getAllFeedback);
+router.get("/getAll", getAllFeedback);
 
 // Get feedback by student
 router.get("/student/:studentId", getFeedbackByStudent);

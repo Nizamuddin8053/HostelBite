@@ -5,9 +5,9 @@ const db = require("../config/Database");  // MySQL connection
 // SIGNUP controller (already written above)
 exports.signup = async (req, res) => {
     try {
-        const { name, email, password,confirmPassword, role, room_number, staffRole, salary_amount } = req.body;
+        const { name, email, password,confirmPassword, role, room_number, staffRole,course,year } = req.body;
 
-        if (!name || !email || !password || !confirmPassword || !role) {
+        if (!name || !email || !password || !confirmPassword || !role)  {
             return res.status(400).json({ message: "All required fields must be provided" });
         }
 
@@ -20,12 +20,21 @@ exports.signup = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         if (role === "student") {
-            const sql = `INSERT INTO STUDENT (name, email, password, room_number) VALUES (?, ?, ?, ?)`;
-            db.query(sql, [name, email, hashedPassword, room_number || null], (err, result) => {
+
+            if (!room_number || !course || !year) {
+                return res.status(400).json({ message: "All required fields must be provided" });
+            }
+
+            const sql = `INSERT INTO STUDENT (name, email, password, room_number,course,year) VALUES (?, ?, ?, ?, ?, ?)`;
+            db.query(sql, [name, email, hashedPassword, room_number,course,year], (err, result) => {
                 if (err) return res.status(500).json({ message: "DB Error", error: err });
                 res.status(201).json({ message: "Student registered", studentId: result.insertId });
             });
         } else if (role === "staff") {
+
+            if (!staffRole) {
+                return res.status(400).json({ message: "fill staff role" });
+            }
             const sql = `INSERT INTO STAFF (name, role, email, password, salary_amount) VALUES (?, ?, ?, ?, ?)`;
             db.query(sql, [name, staffRole || "general", email, hashedPassword, salary_amount || 0], (err, result) => {
                 if (err) return res.status(500).json({ message: "DB Error", error: err });

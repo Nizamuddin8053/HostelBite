@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -13,7 +12,8 @@ const SignupForm = () => {
         role: "",
         room_number: "",
         staffRole: "",
-        
+        course: "",
+        year: "",
     });
 
     const handleChange = (e) => {
@@ -23,36 +23,59 @@ const SignupForm = () => {
         });
     };
 
+    // ✅ Email validation regex
+    const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+    // ✅ Password strength checker
+    const isStrongPassword = (password) =>
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        const { name, email, password, confirmPassword, role } = formData;
 
-        // First verify email by sending OTP to email
-        const otp = Math.floor(100000 + Math.random() * 900000);
-        console.log("OTP for email verification:", otp);
+        // --- Basic validations ---
+        if (!email || !password || !confirmPassword) {
+            alert("Please fill all required fields!");
+            return;
+        }
 
-        if (formData.password !== formData.confirmPassword) {
+        if (!isValidEmail(email)) {
+            alert("Please enter a valid email address!");
+            return;
+        }
+
+        if (!isStrongPassword(password)) {
+            alert(
+                "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character."
+            );
+            return;
+        }
+
+        if (password !== confirmPassword) {
             alert("Passwords do not match!");
             return;
         }
 
-
-        // store in database
+        // --- Generate OTP for email verification (simulation) ---
+        const otp = Math.floor(100000 + Math.random() * 900000);
+        console.log("OTP for email verification:", otp);
 
         try {
-            // Adjust the API URL based on your backend
             const response = await axios.post(
                 "http://localhost:4000/api/auth/signup",
                 formData
             );
 
             console.log("✅ Signup successful:", response.data);
-            alert("Signup successful!");
+            alert("Signup successful! You can now log in.");
             navigate("/login");
         } catch (error) {
-            console.error(" Signup error:", error.response?.data || error.message);
+            console.error("Signup error:", error.response?.data || error.message);
             alert(error.response?.data?.message || "Signup failed!");
         }
+
         console.log("Form Submitted:", formData);
     };
 
@@ -69,22 +92,18 @@ const SignupForm = () => {
                 </h2>
 
                 {/* Name */}
-                {(role !== "staff" || role === "") && (
-                    <div>
-                        <label className="block mb-1 text-gray-600 font-medium">
-                            Name
-                        </label>
-                        <input
-                            type="text"
-                            required
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            placeholder="Enter your name"
-                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                        />
-                    </div>
-                )}
+                <div>
+                    <label className="block mb-1 text-gray-600 font-medium">Name</label>
+                    <input
+                        type="text"
+                        required
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        placeholder="Enter your name"
+                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    />
+                </div>
 
                 {/* Email */}
                 <div>
@@ -114,6 +133,9 @@ const SignupForm = () => {
                         placeholder="Enter password"
                         className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     />
+                    <p className="text-xs text-gray-500 mt-1">
+                        Must contain 8+ chars, uppercase, lowercase, number & symbol.
+                    </p>
                 </div>
 
                 {/* Confirm Password */}
@@ -151,43 +173,96 @@ const SignupForm = () => {
                 {/* Conditional Inputs */}
                 {role === "student" && (
                     <div>
+                        <div>
+                            <label className="block mb-1 text-gray-600 font-medium">
+                                Room Number
+                            </label>
+                            <input
+                                type="text"
+                                name="room_number"
+                                value={formData.room_number}
+                                onChange={handleChange}
+                                placeholder="Enter room number"
+                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            />
+                        </div>
+
+                        <div className="mt-4">
+                            <label className="block mb-1 text-gray-600 font-medium">
+                                Course
+                            </label>
+                            <select
+                                name="course"
+                                value={formData.course}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            >
+                                <option value="">Select course</option>
+                                <option value="MCA">MCA</option>
+                                <option value="Btech">B.Tech</option>
+                                <option value="Mtech">M.Tech</option>
+                            </select>
+                        </div>
+
+                        {/* Year selection based on course */}
+                        {formData.course && (
+                            <div className="mt-4">
+                                <label className="block mb-1 text-gray-600 font-medium">
+                                    Year
+                                </label>
+                                <select
+                                    name="year"
+                                    value={formData.year}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                >
+                                    <option value="">Choose your year</option>
+                                    {formData.course === "Btech" && (
+                                        <>
+                                            <option value="1">1st year</option>
+                                            <option value="2">2nd year</option>
+                                            <option value="3">3rd year</option>
+                                            <option value="4">4th year</option>
+                                        </>
+                                    )}
+                                    {formData.course === "MCA" && (
+                                        <>
+                                            <option value="1">1st year</option>
+                                            <option value="2">2nd year</option>
+                                            <option value="3">3rd year</option>
+                                        </>
+                                    )}
+                                    {formData.course === "Mtech" && (
+                                        <>
+                                            <option value="1">1st year</option>
+                                            <option value="2">2nd year</option>
+                                        </>
+                                    )}
+                                </select>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {role === "staff" && (
+                    <div>
                         <label className="block mb-1 text-gray-600 font-medium">
-                            Room Number
+                            Staff Role
                         </label>
                         <input
                             type="text"
-                            name="room_number"
-                            value={formData.room_number}
+                            name="staffRole"
+                            value={formData.staffRole}
                             onChange={handleChange}
-                            placeholder="Enter room number"
+                            placeholder="Enter staff role"
                             className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         />
                     </div>
                 )}
 
-                {role === "staff" && (
-                    <>
-                        <div>
-                            <label className="block mb-1 text-gray-600 font-medium">
-                                Staff Role
-                            </label>
-                            <input
-                                type="text"
-                                name="staffRole"
-                                value={formData.staffRole}
-                                onChange={handleChange}
-                                placeholder="Enter staff role"
-                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                            />
-                        </div>
-
-                       
-                    </>
-                )}
-
                 {/* Submit Button */}
                 <button
-                    type="submit" 
+                    type="submit"
                     className="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition duration-300"
                 >
                     Sign Up

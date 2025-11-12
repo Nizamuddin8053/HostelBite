@@ -1,7 +1,17 @@
 import React from "react";
 import { UtensilsCrossed, DollarSign } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const ManageMenuExpenses = () => {
+    const navigate = useNavigate();
+
+    const expenseHandler = () => {
+        navigate("/management/expense/expense-items");
+    }
+
+    const menuHandler = () => {
+        navigate("/management/menu/menu-items");
+    };
     return (
         <div className="bg-white p-5 rounded-2xl shadow-md">
             <div className="flex items-center mb-3">
@@ -14,18 +24,13 @@ const ManageMenuExpenses = () => {
             </p>
 
             <div className="flex gap-3 flex-wrap">
-                <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
-                    Add Menu
+                <button onClick={menuHandler} className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                    Menu
                 </button>
-                <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
-                    View Menu
+                <button onClick={expenseHandler}  className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                    Expenses
                 </button>
-                <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
-                    Add Expenses
-                </button>
-                <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
-                    View Expenses
-                </button>
+                
 
             </div>
         </div>

@@ -1,10 +1,14 @@
 import React from "react";
 import { Star, ClipboardList } from "lucide-react";
 import axios from "axios";
+import {useNavigate} from "react-router-dom";
 
 const FeedbackSection = () => {
+    const navigate = useNavigate();
 
-
+    const submitFeedback = async () => {
+        navigate("/submit-feedback");
+    }
     return (
         <div className="bg-white p-5 rounded-2xl shadow-md">
             <div className="flex items-center mb-3">
@@ -16,13 +20,11 @@ const FeedbackSection = () => {
                 Submit feedback and view attendance records.
             </p>
 
-            <div className="flex gap-3 flex-wrap">
-                <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+            <div  className="flex gap-3 flex-wrap">
+                <button onClick={submitFeedback} className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
                     Submit Feedback
                 </button>
-                <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
-                    View Feedback
-                </button>
+                
                 <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
                     View Attendance
                 </button>

@@ -3,14 +3,14 @@ const db = require("../../config/Database");
 
 // Add new expense
 exports.createExpense = (req, res) => {
-    const { title, amount, category, date, description } = req.body;
+    const { title, category, date, description, qty, rate_kg, amount, management_id } = req.body;
 
-    if (!title || !amount || !category || !date) {
-        return res.status(400).json({ error: "Title, amount, category, and date are required" });
+    if (!title || !qty || !rate_kg || !category || !date) {
+        return res.status(400).json({ error: "Title, quantity, rate per kg, category, and date are required" });
     }
 
-    const sql = "INSERT INTO expenses (title, amount, category, date, description) VALUES (?, ?, ?, ?, ?)";
-    db.query(sql, [title, amount, category, date, description || null], (err, result) => {
+    const sql = "INSERT INTO expenses (category, amount, date, description, management_id, title, qty, rate_kg) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    db.query(sql, [category, rate_kg*qty, date, description || null, management_id, title, qty, rate_kg], (err, result) => {
         if (err) {
             console.error("Error inserting expense:", err);
             return res.status(500).json({ error: "Database error" });
@@ -21,21 +21,44 @@ exports.createExpense = (req, res) => {
 
 // Get all expenses
 exports.getAllExpenses = (req, res) => {
-    const sql = "SELECT * FROM expenses ORDER BY date DESC";
-    db.query(sql, (err, results) => {
+    const allExpensesSql = "SELECT * FROM expenses ORDER BY date DESC";
+    const totalAmountSql = "SELECT SUM(amount) AS totalAmount FROM expenses";
+    const categoryBreakdownSql = "SELECT category, SUM(amount) AS categoryTotal FROM expenses GROUP BY category";
+
+    db.query(allExpensesSql, (err, expenses) => {
         if (err) {
             console.error("Error fetching expenses:", err);
-            return res.status(500).json({ error: "Database error" });
+            return res.status(500).json({ error: "Database error while fetching expenses" });
         }
-        res.status(200).json(results);
+
+        db.query(totalAmountSql, (err, totalResult) => {
+            if (err) {
+                console.error("Error fetching total amount:", err);
+                return res.status(500).json({ error: "Database error while fetching total amount" });
+            }
+
+            db.query(categoryBreakdownSql, (err, categoryResults) => {
+                if (err) {
+                    console.error("Error fetching category breakdown:", err);
+                    return res.status(500).json({ error: "Database error while fetching category breakdown" });
+                }
+
+                res.status(200).json({
+                    expenses,
+                    totalAmount: totalResult[0]?.totalAmount || 0,
+                    categoryBreakdown: categoryResults
+                });
+            });
+        });
     });
 };
 
+
 // Get expense by ID
 exports.getExpenseById = (req, res) => {
-    const { id } = req.params;
-    const sql = "SELECT * FROM expenses WHERE id = ?";
-    db.query(sql, [id], (err, result) => {
+    const { expense_id } = req.body;
+    const sql = "SELECT * FROM expenses WHERE expense_id = ?";
+    db.query(sql, [expense_id], (err, result) => {
         if (err) {
             console.error("Error fetching expense:", err);
             return res.status(500).json({ error: "Database error" });

@@ -3,14 +3,15 @@ const db = require("../../config/Database");
 
 // Create a new notification
 exports.createNotification = (req, res) => {
-    const { user_id, title, message, type } = req.body;
+    const {user_id, title, message } = req.body;
+    
 
     if (!title || !message) {
         return res.status(400).json({ error: "Title and message are required" });
     }
 
-    const sql = "INSERT INTO notifications (user_id, title, message, type) VALUES (?, ?, ?, ?)";
-    db.query(sql, [user_id || null, title, message, type || "general"], (err, result) => {
+    const sql = "INSERT INTO notifications (user_id, title, message, sent_at) VALUES (?, ?, ?, Now())";
+    db.query(sql, [user_id || null, title, message, sent_at], (err, result) => {
         if (err) {
             console.error("Error creating notification:", err);
             return res.status(500).json({ error: "Database error" });

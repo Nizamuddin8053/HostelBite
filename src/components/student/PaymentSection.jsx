@@ -1,7 +1,14 @@
 import React from "react";
 import { CreditCard, FileText, Clock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const PaymentSection =()=> {
+
+    const navigate = useNavigate();
+    
+    const makePaymentHandler = () => {
+        navigate("/student/make-payment");
+    }
     return (
         <div className="bg-white p-5 rounded-2xl shadow-md">
             <div className="flex items-center mb-3">
@@ -20,7 +27,7 @@ const PaymentSection =()=> {
                 <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
                     Track Payment Status
                 </button>
-                <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                <button onClick={makePaymentHandler} className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
                     Make Payment
                 </button>
             </div>

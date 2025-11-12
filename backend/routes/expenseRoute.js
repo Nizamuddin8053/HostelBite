@@ -14,7 +14,7 @@ const router = express.Router();
 router.post("/", createExpense);
 
 // Get all expenses
-router.get("/", getAllExpenses);
+router.get("/viewAllExpenses", getAllExpenses);
 
 // Get expense by ID
 router.get("/:id", getExpenseById);

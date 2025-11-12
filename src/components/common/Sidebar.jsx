@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import {
     Bell,
     FileText,
@@ -9,35 +10,34 @@ import {
     Users,
 } from "lucide-react";
 
-const Sidebar =({ role })=> {
-    const commonLinks = [{ label: "Notifications", icon: Bell }];
-
+const Sidebar = ({ role }) => {
+   
     const studentLinks = [
-        { label: "Complaints", icon: FileText },
-        { label: "Feedback & Attendance", icon: Book },
-        { label: "Menu", icon: Utensils },
-        { label: "Payments", icon: CreditCard },
+        { label: "Complaints", icon: FileText, path: "/student-dashboard/complaint-section" },
+        { label: "Feedback & Attendance", icon: Book, path: "/student-dashboard/feedback-section" },
+        { label: "Menu", icon: Utensils, path: "/student-dashboard/menu-section" },
+        { label: "Payments", icon: CreditCard, path: "/student-dashboard/payment-section" },
+        { label: "Notifications", icon: Bell, path: "/student-dashboard/notification-section" },
     ];
 
     const staffLinks = [
-        { label: "Salary", icon: FileSpreadsheet },
-        { label: "Feedback & Attendance", icon: Book },
-        { label: "Complaints & Notifications", icon: FileText },
-        { label: "Menu", icon: Utensils },
+        { label: "Salary", icon: FileSpreadsheet, path: "/staff-dashboard/salary-section" },
+        { label: "Feedback & Attendance", icon: Book, path: "/staff-dashboard/feedback-section" },
+        { label: "Complaints & Notifications", icon: FileText, path: "/staff-dashboard/complaints-section" },
+        { label: "Menu", icon: Utensils, path: "/staff-dashboard/menu-section" },
     ];
 
     const adminLinks = [
-        { label: "Feedback & Attendance", icon: Book },
-        { label: "Menu & Expenses", icon: Utensils },
-        { label: "Payments & Invoices", icon: CreditCard },
-        { label: "Staff Salary", icon: FileSpreadsheet },
-        { label: "Manage Complaints & Notifications", icon: FileText },
-        { label: "User Management", icon: Users },
+        { label: "Feedback & Attendance", icon: Book, path: "/admin-dashboard/feedback-section" },
+        { label: "Menu & Expenses", icon: Utensils, path: "/admin-dashboard/menu-section" },
+        { label: "Payments & Invoices", icon: CreditCard, path: "/admin-dashboard/payments-section" },
+        { label: "Staff Salary", icon: FileSpreadsheet, path: "/admin-dashboard/salary-section" },
+        { label: "Manage Complaints & Notifications", icon: FileText, path: "/admin-dashboard/complaints-section" },
+        { label: "User Management", icon: Users, path: "/admin-dashboard/users-section" },
     ];
 
     let links = [];
-
-    if (role === "student") links = [...studentLinks, ...commonLinks];
+    if (role === "student") links = [...studentLinks];
     else if (role === "staff") links = [...staffLinks];
     else if (role === "admin") links = [...adminLinks];
 
@@ -48,16 +48,18 @@ const Sidebar =({ role })=> {
             </h2>
             <nav className="space-y-3">
                 {links.map((link, i) => (
-                    <a
+                    <Link
                         key={i}
+                        to={link.path}
                         className="flex items-center p-2 hover:bg-indigo-50 rounded cursor-pointer"
                     >
                         <link.icon className="mr-2 text-indigo-600" />
                         {link.label}
-                    </a>
+                    </Link>
                 ))}
             </nav>
         </div>
     );
-}
+};
+
 export default Sidebar;

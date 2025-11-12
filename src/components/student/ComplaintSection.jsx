@@ -1,7 +1,25 @@
 import React from "react";
 import { MessageSquare } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
+
+
 
 const ComplaintSection = () =>   {
+
+
+    const navigate = useNavigate();
+    
+    const submitHandler = () => {
+        navigate("/submit-complaint");
+    };
+
+    const getComplaintHandler = () => {
+        navigate("/complaints");
+    }
+
+
+
     return (
         <div className="bg-white p-5 rounded-2xl shadow-md">
             <div className="flex items-center mb-3">
@@ -10,10 +28,10 @@ const ComplaintSection = () =>   {
             </div>
             <p className="text-gray-600 mb-3">Submit and view your complaints or feedback.</p>
             <div className="flex gap-3">
-                <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                <button onClick={submitHandler} className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
                     Submit Complaint
                 </button>
-                <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
+                <button onClick={getComplaintHandler} className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
                     View Complaints
                 </button>
             </div>

@@ -14,15 +14,15 @@ const router = express.Router();
 router.post("/", createMenu);
 
 // Get all menu items
-router.get("/", getAllMenu);
+router.get("/getAll", getAllMenu);
 
 // Get menu by ID
 router.get("/:id", getMenuById);
 
 // Update menu item
-router.put("/:id", updateMenu);
+router.put("/updateMenu", updateMenu);
 
 // Delete menu item
-router.delete("/:id", deleteMenu);
+router.delete("/delete", deleteMenu);
 
 module.exports = router;

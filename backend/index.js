@@ -17,6 +17,8 @@ const menuRoutes = require("./routes/menuRoute");
 const notificationRoutes = require("./routes/notificationRoute");
 const salaryRoutes = require("./routes/salaryRoute");
 const staffRoutes = require("./routes/staffRoute");
+const paymentRoutes = require("./routes/paymentRoutes");
+
 
 
 
@@ -44,6 +46,7 @@ app.use("/api/menu", menuRoutes);
 app.use("/api/notification", notificationRoutes);
 app.use("/api/salary", salaryRoutes);
 app.use("/api/staff", staffRoutes);
+app.use("/api/payments", paymentRoutes);
 
 const PORT = process.env.PORT || 5000;
 

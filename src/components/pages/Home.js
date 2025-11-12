@@ -1,7 +1,13 @@
 import React from "react";
 import { Utensils, Leaf, Drumstick, CreditCard, Bell, ClipboardList } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
+    const navigate = useNavigate();
+    function exploreMenu(){
+        navigate("/view-menu");
+
+    }
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
            
@@ -15,7 +21,7 @@ const Home = () => {
                     all in one platform. Fresh, fast, and efficient.
                 </p>
                 <div className="flex space-x-4">
-                    <button className="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700">
+                    <button onClick={exploreMenu} className="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700">
                         Explore Menu
                     </button>
                     <button className="border border-indigo-600 text-indigo-700 px-6 py-3 rounded-xl hover:bg-indigo-50">

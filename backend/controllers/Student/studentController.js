@@ -11,9 +11,10 @@ exports.getAllStudents = (req, res) => {
 
 // ✅ Get student by ID
 exports.getStudentById = (req, res) => {
-    const { id } = req.params;
+    const {id } = req.params;
+    student_id = id;
     const sql = "SELECT student_id, name, email, room_number FROM STUDENT WHERE student_id = ?";
-    db.query(sql, [id], (err, results) => {
+    db.query(sql, [student_id], (err, results) => {
         if (err) return res.status(500).json({ message: "DB Error", error: err });
         if (results.length === 0) return res.status(404).json({ message: "Student not found" });
         res.status(200).json(results[0]);

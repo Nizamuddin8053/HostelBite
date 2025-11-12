@@ -10,18 +10,18 @@ const {
 } = require("../controllers/Student/complaintController");
 
 // Create a new complaint
-router.post("/", createComplaint);
+router.post("/complaint", createComplaint);
 
 // Get all complaints
 router.get("/", getAllComplaints);
 
 // Get a complaint by ID
-router.get("/:id", getComplaintById);
+router.get("/complaint/:id", getComplaintById);
 
 // Update complaint status
-router.put("/:id/status", updateComplaintStatus);
+router.put("/:id/resolve", updateComplaintStatus);
 
 // Delete a complaint
-router.delete("/:id", deleteComplaint);
+router.delete("/complaint/:id", deleteComplaint);
 
 module.exports = router;

@@ -1,7 +1,14 @@
 import React from "react";
 import { MessageSquare } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const ManageComplaintNotification = () => {
+    const navigate = useNavigate();
+    const viewComplaintHandler = () => {
+        // Logic to view complaints
+        navigate("/all-complaints");
+    };
+
     return (
         <div className="bg-white p-5 rounded-2xl shadow-md">
             <div className="flex items-center mb-3">
@@ -10,7 +17,7 @@ const ManageComplaintNotification = () => {
             </div>
             <p className="text-gray-600 mb-3">View complaints and notifications.</p>
             <div className="flex flex-wrap gap-3">
-                <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
+                <button onClick={viewComplaintHandler} className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
                     {/* respond to complaint also send notification for complaint resolved */}
                     View Complaints 
                 </button>

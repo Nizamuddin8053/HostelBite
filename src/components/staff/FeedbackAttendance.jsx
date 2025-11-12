@@ -1,8 +1,14 @@
 import React from "react";
 import { Star, ClipboardList } from "lucide-react";
 import axios from "axios";
+import {useNavigate} from "react-router-dom";
 
 const FeedbackAttendance = () => {
+    const navigate = useNavigate();
+
+    const ViewAllFeedbackHandler = async () => {
+        navigate("/feedback-list");
+    }
 
 
     return (
@@ -18,7 +24,7 @@ const FeedbackAttendance = () => {
 
             <div className="flex gap-3 flex-wrap">
                 
-                <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
+                <button onClick={ViewAllFeedbackHandler} className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
                     View Feedback
                 </button>
                 <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
