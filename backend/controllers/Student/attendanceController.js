@@ -1,20 +1,36 @@
 const db = require("../../config/Database");
 
-// ✅ Mark attendance (insert new record)
+// ✅ Mark attendance
 exports.markAttendance = (req, res) => {
-    const { student_id, menu_id, date, meal_type, status } = req.body;
+    const { student_id, menu_id, meal_type, token } = req.body;
 
-    if (!student_id || !menu_id || !date || !meal_type || !status) {
+    if (!student_id || !menu_id || !meal_type || !token) {
         return res.status(400).json({ message: "All fields are required" });
     }
 
-    const sql = `INSERT INTO ATTENDANCE (student_id, menu_id, date, meal_type, status) 
-               VALUES (?, ?, ?, ?, ?)`;
-    db.query(sql, [student_id, menu_id, date, meal_type, status], (err, result) => {
+    const date = new Date().toISOString().split("T")[0];
+    const status = "present";
+
+    // Check if attendance already marked
+    const checkQuery = `SELECT * FROM attendance WHERE student_id = ? AND date = ? AND meal_type = ?`;
+    db.query(checkQuery, [student_id, date, meal_type], (err, result) => {
         if (err) return res.status(500).json({ message: "DB Error", error: err });
-        res.status(201).json({ message: "Attendance marked successfully", attendanceId: result.insertId });
+
+        if (result.length > 0) {
+            return res.status(200).json({ message: "Attendance already marked" });
+        }
+
+        // Insert attendance
+        const insertQuery = `INSERT INTO attendance (student_id, menu_id, date, meal_type, status, token)
+                         VALUES (?, ?, ?, ?, ?, ?)`;
+
+        db.query(insertQuery, [student_id, menu_id, date, meal_type, status, token], (err2, result2) => {
+            if (err2) return res.status(500).json({ message: "DB Error", error: err2 });
+            res.status(201).json({ message: "Attendance marked successfully", attendanceId: result2.insertId });
+        });
     });
 };
+
 
 // ✅ Get all attendance records
 exports.getAllAttendance = (req, res) => {

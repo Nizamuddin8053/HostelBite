@@ -9,6 +9,9 @@ const FeedbackSection = () => {
     const submitFeedback = async () => {
         navigate("/submit-feedback");
     }
+    const markAttendance = async () => {
+        navigate("/mark-attendance");
+    }
     return (
         <div className="bg-white p-5 rounded-2xl shadow-md">
             <div className="flex items-center mb-3">
@@ -25,8 +28,8 @@ const FeedbackSection = () => {
                     Submit Feedback
                 </button>
                 
-                <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
-                    View Attendance
+                <button onClick={markAttendance} className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                    Attendance
                 </button>
             </div>
         </div>

@@ -11,13 +11,13 @@ const {
 const router = express.Router();
 
 // Create new notification
-router.post("/", createNotification);
+router.post("/createNotification", createNotification);
 
 // Get all notifications
 router.get("/", getAllNotifications);
 
 // Get notifications by user
-router.get("/user/:userId", getNotificationsByUser);
+router.get("/:userId/:role", getNotificationsByUser);
 
 // Mark notification as read
 router.put("/:id/read", markAsRead);

@@ -18,6 +18,7 @@ const notificationRoutes = require("./routes/notificationRoute");
 const salaryRoutes = require("./routes/salaryRoute");
 const staffRoutes = require("./routes/staffRoute");
 const paymentRoutes = require("./routes/paymentRoutes");
+const qrRoutes = require("./routes/qrRoutes");
 
 
 
@@ -47,6 +48,7 @@ app.use("/api/notification", notificationRoutes);
 app.use("/api/salary", salaryRoutes);
 app.use("/api/staff", staffRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/qr", qrRoutes);
 
 const PORT = process.env.PORT || 5000;
 

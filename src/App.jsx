@@ -1,5 +1,6 @@
 import React from "react";
 import {Routes, Route, Navigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import Navbar from "./components/common/Navbar";
 import Home from "./components/pages/Home";
 import About from "./components/pages/About";
@@ -7,6 +8,7 @@ import Services from "./components/pages/Services";
 import Contact from "./components/pages/Contact";
 import Signup from "./components/auth/Signup";
 import Login from "./components/auth/Login";
+import UserNotifications from "./components/common/UserNotifications";
 
 
 // import student components
@@ -18,6 +20,7 @@ import FeedbackSection from "./components/student/FeedbackSection";
 import NotificationSection from "./components/student/NotificationSection";
 import PaymentSection from "./components/student/PaymentSection";
 import MenuSection from "./components/common/Menu";
+import MarkAttendance from "./components/student/MarkAttendance";
 
 
 import SubmitComplaint from "./components/student/studentFunctions/SubmitComplaint";
@@ -25,6 +28,7 @@ import SubmitFeedback from "./components/student/studentFunctions/GiveFeedback"
 import GetAllComplaintsByStudent from "./components/student/studentFunctions/GetAllComplaints";  
 import ViewMenu from "./components/management/manageFunctions/menuFunctions/ViewMenu";
 import MessPayment from "./components/student/studentFunctions/MessPayment";
+import ScanQR from "./components/student/studentFunctions/ScanQR";
 
 // import admin components
 import AdminDashboard from "./components/dashboard/AdminDashboard";
@@ -45,8 +49,10 @@ import DeleteMenu from "./components/management/manageFunctions/menuFunctions/De
 import AddExpense from "./components/management/manageFunctions/expenseFunctions/AddExpense";
 import ExpenseItems from "./components/management/manageFunctions/ExpenseItems";
 import ViewExpenses from "./components/management/manageFunctions/expenseFunctions/ViewExpenses";
-import CheckAnExpense from "./components/management/manageFunctions/expenseFunctions/CheckAnExpense";
 import AllComplaints from "./components/management/manageFunctions/complaintFunctions/AllComplaints";
+import QRDisplay from "./components/management/manageFunctions/attendance/QRDisplay";
+import RemoveStudents from "./components/management/manageFunctions/userManagement/RemoveStudents";
+import SendNotification from "./components/management/manageFunctions/notification/SendNotification";
 
 
 // import staff components
@@ -60,6 +66,15 @@ import SalarySection from "./components/staff/SalarySection";
 
 
 function App() {
+
+  
+  // const token = localStorage.getItem("token");
+  // const decoded = jwtDecode(token);
+  // const role = decoded.role;
+  // const userId = decoded.id;
+
+
+ 
 
   return (
     <div className="min-h-screen bg-gray-100 overflow-x-hidden">
@@ -77,6 +92,7 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
           <Route path="*" element={<Navigate to="/" />} />
+          <Route path="/userNotification" element={<UserNotifications />}/>
 
 
           {/* Student Routes */}
@@ -101,7 +117,6 @@ function App() {
             <Route index element={<AdminDashboard />} />
             <Route path="feedback-section" element={<ManageFeedbackAttendance />}/>
             <Route path="menu-section" element={<ManageMenuExpenses />}/>
-            <Route path="" element={<ManageMenuExpenses />}/>
             <Route path="payments-section" element={<ManagePaymentInvoice />}/>
             <Route path="salary-section" element={<ManageStaffSalary/>}/>
             <Route path="complaints-section" element={<ManageComplaintNotification />}/>
@@ -126,12 +141,14 @@ function App() {
           <Route path="view-menu" element={<ViewMenu />} />
           <Route path="complaints" element={<GetAllComplaintsByStudent />} /> 
           <Route path="/student/make-payment" element={<MessPayment />} />
+          <Route path="/mark-attendance" element={<ScanQR />} />
+          <Route path="/mark-attendance" element={<MarkAttendance />} />
 
     
 
           {/* <Route path="/student-dashboard" element={<StudentDashboard />} /> */}
-          <Route path="/admin-dashboard" element={<AdminDashboard />} />
-          <Route path="/staff-dashboard" element={<StaffDashboard />} />
+          {/* <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/staff-dashboard" element={<StaffDashboard />} /> */}
 
 
 
@@ -143,16 +160,15 @@ function App() {
           <Route path="feedback-list" element={<FeedbackList />} />
           <Route path="/add-expense" element={<AddExpense />} />
           <Route path="/view-expenses" element={<ViewExpenses />} />
-          <Route path="/check-expense" element={<CheckAnExpense />} />
           <Route path="/management/expense/expense-items" element={<ExpenseItems />} />
           {/* Complaints  */}
           <Route path="all-complaints" element={<AllComplaints />} />
+          <Route path="get-attendance-qr" element={<QRDisplay />} />
+          <Route path ="/remove-students" element={<RemoveStudents/>}/>
+          <Route path= "/send-notification" element={<SendNotification/>}/>
 
           
-         
-          
-          
-          
+    
 
         </Routes>
       </div>

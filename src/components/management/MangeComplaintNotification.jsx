@@ -9,6 +9,10 @@ const ManageComplaintNotification = () => {
         navigate("/all-complaints");
     };
 
+    const sendNotificationHandler = ()=>{
+        navigate("/send-notification")
+    }
+
     return (
         <div className="bg-white p-5 rounded-2xl shadow-md">
             <div className="flex items-center mb-3">
@@ -22,12 +26,10 @@ const ManageComplaintNotification = () => {
                     View Complaints 
                 </button>
         
-                <button className="bg-green-600 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
+                <button onClick={sendNotificationHandler} className="bg-green-600 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
                     Send Notification
                 </button>
-                <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
-                    View Notifications
-                </button>
+                
             </div>
         </div>
     );

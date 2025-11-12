@@ -11,6 +11,10 @@ const ManageFeedbackAttendance = () => {
         navigate("/feedback-list");
     }
 
+    const attendanceHandler = async () => {
+        navigate("/get-attendance-qr");
+    }
+
 
     return (
         <div className="bg-white p-5 rounded-2xl shadow-md">
@@ -28,8 +32,8 @@ const ManageFeedbackAttendance = () => {
                 <button onClick={viewFeedbackHandler} className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
                     View Feedback
                 </button>
-                <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
-                    View Attendance
+                <button onClick={attendanceHandler} className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                     Attendance
                 </button>
             </div>
         </div>

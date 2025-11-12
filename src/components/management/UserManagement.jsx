@@ -1,8 +1,15 @@
 import React from "react";
 import { User, ClipboardList } from "lucide-react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const UserManagement = () => {
+    const navigate = useNavigate();
+
+    const removeHandler = ()=>{
+        navigate("/remove-students");
+
+    }
 
 
     return (
@@ -18,7 +25,7 @@ const UserManagement = () => {
 
             <div className="flex gap-3 flex-wrap">
 
-                <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
+                <button onClick={removeHandler} className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
                     Remove Student
                 </button>
                 <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">

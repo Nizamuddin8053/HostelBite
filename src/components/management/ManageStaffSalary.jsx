@@ -31,9 +31,7 @@ const ManageStaffSalary = ({ role }) => {
                 <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
                     View Salary
                 </button>
-                <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
-                    View Salary Slip
-                </button>
+                
             </div>
         </div>
     );
