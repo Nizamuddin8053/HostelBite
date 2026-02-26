@@ -23,12 +23,12 @@ const SignupForm = () => {
         });
     };
 
-    // ✅ Email validation regex
+    //  Email validation regex
     const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-    // ✅ Password strength checker
+    //  Password strength checker
     const isStrongPassword = (password) =>
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password);
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/.test(password);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -68,7 +68,7 @@ const SignupForm = () => {
                 formData
             );
 
-            console.log("✅ Signup successful:", response.data);
+            console.log(" Signup successful:", response.data);
             alert("Signup successful! You can now log in.");
             navigate("/login");
         } catch (error) {

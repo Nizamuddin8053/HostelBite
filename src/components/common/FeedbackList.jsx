@@ -13,7 +13,7 @@ const FeedbackList = () => {
                 setFeedbacks(res.data);
             } catch (err) {
                 console.error(err);
-                setError("❌ Failed to fetch feedback");
+                setError(" Failed to fetch feedback");
             } finally {
                 setLoading(false);
             }

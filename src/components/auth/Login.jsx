@@ -44,7 +44,7 @@ const LoginForm = () => {
             // when we are log in add token and role to localstorage
 
 
-            console.log("✅ Login response:", response.data);
+            console.log(" Login response:", response.data);
             localStorage.setItem("token", response.data.token);
             localStorage.setItem("role", response.data.role);
             alert("Login successful!");
@@ -63,7 +63,7 @@ const LoginForm = () => {
 
 
         } catch (error) {
-            console.error("❌ Login error:", error.response?.data || error.message);
+            console.error(" Login error:", error.response?.data || error.message);
             alert(error.response?.data?.message || "Login failed!");
         }
     };
