@@ -10,7 +10,7 @@ import Signup from "./components/auth/Signup";
 import Login from "./components/auth/Login";
 import UserNotifications from "./components/common/UserNotifications";
 
-
+// This is a comment 
 // import student components
 import StudentLayout from "./components/dashboard/StudentLayout";
 import StudentDashboard from "./components/dashboard/StudentDashboard";
