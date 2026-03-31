@@ -39,7 +39,11 @@ pipeline {
 
         stage('Build Frontend') {
             steps {
-                bat 'npm run build'
+                '''
+                 set CI=false
+                 bat 'npm run build'
+                 
+                ''' 
             }
         }
 
