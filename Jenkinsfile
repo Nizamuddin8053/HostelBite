@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        VERCEL_TOKEN = "hostelbite-vercel-token"
+        VERCEL_TOKEN = "hostelbite_vercel_token"
     }
     
     stages {
