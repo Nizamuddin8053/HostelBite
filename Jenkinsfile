@@ -1,47 +1,22 @@
 pipeline {
     agent any
 
-    // tools {
-    //     // nodejs 'node18'
-        
-        
-    // }
-
     environment {
-        FRONTEND_DIR = '.'
-        BACKEND_DIR = 'backend'
-        VERCEL_TOKEN = credentials('vercel-token')
-        RENDER_DEPLOY_HOOK = credentials('render-hook')
+        VERCEL_TOKEN = "hostelbite-vercel-token"
     }
 
     stages {
 
-        stage('Checkout') {
+        stage('Clone Repo') {
             steps {
                 git branch: 'main', url: 'https://github.com/Nizamuddin8053/HostelBite.git'
             }
-
         }
 
-        stage('Install Frontend') {
+        // ================= BACKEND =================
+        stage('Install Backend Dependencies') {
             steps {
-                dir("${FRONTEND_DIR}") {
-                    bat 'npm install'
-                }
-            }
-        }
-
-        stage('Build Frontend'){
-            steps {
-                dir("${FRONTEND_DIR}"){
-                    bat 'npm run build'
-                }
-            }
-        }
-
-        stage('Install Backend') {
-            steps {
-                dir("${BACKEND_DIR}") {
+                dir('backend') {
                     bat 'npm install'
                 }
             }
@@ -49,26 +24,40 @@ pipeline {
 
         stage('Test Backend') {
             steps {
-                dir("${BACKEND_DIR}") {
-                    bat 'echo "Add tests later"'
+                dir('backend') {
+                    bat 'echo Backend Ready'
                 }
             }
         }
 
-        stage('Deploy Frontend on Vercel'){
+        // ================= FRONTEND =================
+        stage('Install Frontend Dependencies') {
             steps {
-                bat '''
-                npm install -g vercel
-                vercel --prod --token=$VERCEL_TOKEN --confirm
-                '''
+                bat 'npm install'
             }
         }
 
-        stage('Deploy Backend on Render') {
+        stage('Build Frontend') {
             steps {
-                bat '''
-                curl -X POST $RENDER_DEPLOY_HOOK
-                '''
+                bat 'npm run build'
+            }
+        }
+
+        // ================= DEPLOY FRONTEND =================
+        stage('Deploy to Vercel') {
+            steps {
+                bat """
+                vercel --prod --token=%VERCEL_TOKEN% --confirm
+                """
+            }
+        }
+
+        // ================= BACKEND DEPLOY =================
+        stage('Trigger Render Deploy') {
+            steps {
+                bat """
+                curl -X POST https://api.render.com/deploy/srv-d74i2os50q8c73e0h870?key=RqU-0nb0AyM
+                """
             }
         }
     }
