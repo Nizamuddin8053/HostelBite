@@ -8,21 +8,23 @@ const {
     deleteExpense
 } = require("../controllers/Management/expenseController");
 
+const {auth,isStudent, isAdmin}  = require("../middlewares/auth");
+
 const router = express.Router();
 
 // Add new expense
-router.post("/", createExpense);
+router.post("/", auth, isAdmin,createExpense);
 
 // Get all expenses
-router.get("/viewAllExpenses", getAllExpenses);
+router.get("/viewAllExpenses", auth, isAdmin, getAllExpenses);
 
 // Get expense by ID
-router.get("/:id", getExpenseById);
+router.get("/:id", auth, isAdmin, getExpenseById);
 
 // Update expense
-router.put("/:id", updateExpense);
+router.put("/:id", auth, isAdmin, updateExpense);
 
 // Delete expense
-router.delete("/:id", deleteExpense);
+router.delete("/:id",   auth, isAdmin, deleteExpense);
 
 module.exports = router;

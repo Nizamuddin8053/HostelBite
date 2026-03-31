@@ -6,6 +6,9 @@ const Navbar = () => {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
 
+    // const name = localStorage.getItem("name");
+
+
     const handleLogout = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("role");
@@ -34,6 +37,11 @@ const Navbar = () => {
                     </>
                 ) : (
                     <>
+
+                         {/* <span className="font-semibold">
+                            Welcome, {name}
+                        </span>
+                         */}
                         <button
                             onClick={() => {
                                 if (role === "student") navigate("/student-dashboard");

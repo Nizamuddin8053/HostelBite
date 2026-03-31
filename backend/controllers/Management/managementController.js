@@ -1,82 +1,116 @@
+const Management = require("../../models/Management");
+const bcrypt = require("bcrypt");
 
-const db = require("../../config/Database");
 
-// Create new management record
-exports.createManagement = (req, res) => {
-    const { name, email, phone, role } = req.body;
+exports.createManagement = async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
 
-    if (!name || !email || !role) {
-        return res.status(400).json({ error: "Name, email, and role are required" });
+    if (!name || !email || !password) {
+      return res.status(400).json({ error: "Name, email, and password are required" });
     }
 
-    const sql = "INSERT INTO management (name, email, phone, role) VALUES (?, ?, ?, ?)";
-    db.query(sql, [name, email, phone || null, role], (err, result) => {
-        if (err) {
-            console.error("Error inserting management:", err);
-            return res.status(500).json({ error: "Database error" });
-        }
-        res.status(201).json({ message: "Management added successfully", managementId: result.insertId });
+    // Check duplicate email
+    const existing = await Management.findOne({ email });
+    if (existing) {
+      return res.status(400).json({ error: "Email already exists" });
+    }
+
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+
+
+    const newManagement = await Management.create({
+      name,
+      email,
+      password: hashedPassword
     });
+
+    res.status(201).json({
+      message: "Management added successfully",
+      managementId: newManagement._id
+    });
+
+  } catch (error) {
+    console.error("Error creating management:", error);
+    res.status(500).json({ error: "Server error" });
+  }
 };
 
-// Get all management records
-exports.getAllManagement = (req, res) => {
-    const sql = "SELECT * FROM management ORDER BY created_at DESC";
-    db.query(sql, (err, results) => {
-        if (err) {
-            console.error("Error fetching management:", err);
-            return res.status(500).json({ error: "Database error" });
-        }
-        res.status(200).json(results);
-    });
+
+exports.getAllManagement = async (req, res) => {
+  try {
+    const managementList = await Management
+      .find()
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(managementList);
+
+  } catch (error) {
+    console.error("Error fetching management:", error);
+    res.status(500).json({ error: "Server error" });
+  }
 };
 
-// Get management by ID
-exports.getManagementById = (req, res) => {
-    const { id } = req.params;
-    const sql = "SELECT * FROM management WHERE id = ?";
-    db.query(sql, [id], (err, result) => {
-        if (err) {
-            console.error("Error fetching management:", err);
-            return res.status(500).json({ error: "Database error" });
-        }
-        if (result.length === 0) {
-            return res.status(404).json({ error: "Management record not found" });
-        }
-        res.status(200).json(result[0]);
-    });
+
+exports.getManagementById = async (req, res) => {
+  try {
+    const management = await Management.findById(req.params.id);
+
+    if (!management) {
+      return res.status(404).json({ error: "Management record not found" });
+    }
+
+    res.status(200).json(management);
+
+  } catch (error) {
+    console.error("Error fetching management:", error);
+    res.status(500).json({ error: "Server error" });
+  }
 };
 
-// Update management details
-exports.updateManagement = (req, res) => {
-    const { id } = req.params;
-    const { name, email, phone, role } = req.body;
 
-    const sql = "UPDATE management SET name = ?, email = ?, phone = ?, role = ? WHERE id = ?";
-    db.query(sql, [name, email, phone, role, id], (err, result) => {
-        if (err) {
-            console.error("Error updating management:", err);
-            return res.status(500).json({ error: "Database error" });
-        }
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: "Management record not found" });
-        }
-        res.status(200).json({ message: "Management updated successfully" });
+exports.updateManagement = async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const updated = await Management.findByIdAndUpdate(
+      req.params.id,
+      { name, email, password: hashedPassword },
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ error: "Management record not found" });
+    }
+
+    res.status(200).json({
+      message: "Management updated successfully",
+      data: updated
     });
+
+  } catch (error) {
+    console.error("Error updating management:", error);
+    res.status(500).json({ error: "Server error" });
+  }
 };
 
-// Delete management record
-exports.deleteManagement = (req, res) => {
-    const { id } = req.params;
-    const sql = "DELETE FROM management WHERE id = ?";
-    db.query(sql, [id], (err, result) => {
-        if (err) {
-            console.error("Error deleting management:", err);
-            return res.status(500).json({ error: "Database error" });
-        }
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: "Management record not found" });
-        }
-        res.status(200).json({ message: "Management deleted successfully" });
-    });
+
+exports.deleteManagement = async (req, res) => {
+  try {
+    const deleted = await Management.findByIdAndDelete(req.params.id);
+
+    if (!deleted) {
+      return res.status(404).json({ error: "Management record not found" });
+    }
+
+    res.status(200).json({ message: "Management deleted successfully" });
+
+  } catch (error) {
+    console.error("Error deleting management:", error);
+    res.status(500).json({ error: "Server error" });
+  }
 };

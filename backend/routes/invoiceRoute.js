@@ -9,24 +9,26 @@ const {
     deleteInvoice
 } = require("../controllers/Student/invoiceController");
 
+// const {auth,isStudent, isAdmin}  = require("../middlewares/auth");
+
 const router = express.Router();
 
 // Create new invoice
 router.post("/", createInvoice);
 
 // Get all invoices
-router.get("/", getAllInvoices);
+router.get("/",  getAllInvoices);
 
 // Get invoice by ID
-router.get("/:id", getInvoiceById);
+router.get("/:id",  getInvoiceById);
 
 // Get invoices by student
-router.get("/student/:studentId", getInvoicesByStudent);
+router.get("/student/:studentId",  getInvoicesByStudent);
 
 // Update invoice status
-router.put("/:id/status", updateInvoiceStatus);
+router.put("/:id/status",  updateInvoiceStatus);
 
 // Delete invoice
-router.delete("/:id", deleteInvoice);
+router.delete("/:id",  deleteInvoice);
 
 module.exports = router;

@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const dbConnection= require("./config/Database");
+const connectDB= require("./config/Database");
 
 
 
@@ -51,16 +51,11 @@ app.use("/api/staff", staffRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/qr", qrRoutes);
 
+
 const PORT = process.env.PORT || 5000;
 
-dbConnection.connect(err=> {
-  if(err){
-    console.log("DB connection error",err);
-  }else{
-    console.log(`db connection successfull`);
-  }
-});
-
+// Mongo db connection
+connectDB();
 // server is running or not 
 
 app.listen(PORT, ()=>{

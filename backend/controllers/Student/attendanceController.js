@@ -1,85 +1,160 @@
-const db = require("../../config/Database");
+const Student = require("../../models/Student");
+const Menu = require("../../models/Menu");
 
-// ✅ Mark attendance
-exports.markAttendance = (req, res) => {
+// mark attendance
+exports.markAttendance = async (req, res) => {
+  try {
     const { student_id, menu_id, meal_type, token } = req.body;
 
     if (!student_id || !menu_id || !meal_type || !token) {
-        return res.status(400).json({ message: "All fields are required" });
+      return res.status(400).json({ message: "All fields are required" });
     }
 
     const date = new Date().toISOString().split("T")[0];
-    const status = "present";
 
-    // Check if attendance already marked
-    const checkQuery = `SELECT * FROM attendance WHERE student_id = ? AND date = ? AND meal_type = ?`;
-    db.query(checkQuery, [student_id, date, meal_type], (err, result) => {
-        if (err) return res.status(500).json({ message: "DB Error", error: err });
+    // Find student
+    const student = await Student.findById(student_id);
 
-        if (result.length > 0) {
-            return res.status(200).json({ message: "Attendance already marked" });
-        }
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
 
-        // Insert attendance
-        const insertQuery = `INSERT INTO attendance (student_id, menu_id, date, meal_type, status, token)
-                         VALUES (?, ?, ?, ?, ?, ?)`;
+    // Check if already marked
+    const alreadyMarked = student.attendance.find(
+      (a) =>
+        a.date.toISOString().split("T")[0] === date &&
+        a.mealType === meal_type
+    );
 
-        db.query(insertQuery, [student_id, menu_id, date, meal_type, status, token], (err2, result2) => {
-            if (err2) return res.status(500).json({ message: "DB Error", error: err2 });
-            res.status(201).json({ message: "Attendance marked successfully", attendanceId: result2.insertId });
+    if (alreadyMarked) {
+      return res.status(200).json({ message: "Attendance already marked" });
+    }
+
+    // Add attendance
+    student.attendance.push({
+      date,
+      mealType: meal_type,
+      status: "present",
+      menuId: menu_id,
+    });
+
+    await student.save();
+
+    res.status(201).json({ message: "Attendance marked successfully" });
+
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error });
+  }
+};
+
+
+// get all attendance
+
+exports.getAllAttendance = async (req, res) => {
+  try {
+    const students = await Student.find().populate("attendance.menuId");
+
+    const allAttendance = [];
+
+    students.forEach((student) => {
+      student.attendance.forEach((att) => {
+        allAttendance.push({
+          studentName: student.name,
+          date: att.date,
+          mealType: att.mealType,
+          status: att.status,
+          menuItems: att.menuId?.items || null,
         });
+      });
     });
+
+    res.status(200).json(allAttendance);
+
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error });
+  }
 };
 
+// get attendance of one student 
 
-// ✅ Get all attendance records
-exports.getAllAttendance = (req, res) => {
-    const sql = `SELECT A.attendance_id, A.date, A.meal_type, A.status, 
-                      S.name AS student_name, M.items AS menu_items
-               FROM ATTENDANCE A
-               JOIN STUDENT S ON A.student_id = S.student_id
-               JOIN MENU M ON A.menu_id = M.menu_id`;
-    db.query(sql, (err, results) => {
-        if (err) return res.status(500).json({ message: "DB Error", error: err });
-        res.status(200).json(results);
-    });
-};
-
-// ✅ Get attendance by student
-exports.getAttendanceByStudent = (req, res) => {
+exports.getAttendanceByStudent = async (req, res) => {
+  try {
     const { studentId } = req.params;
-    const sql = `SELECT A.attendance_id, A.date, A.meal_type, A.status, M.items AS menu_items
-               FROM ATTENDANCE A
-               JOIN MENU M ON A.menu_id = M.menu_id
-               WHERE A.student_id = ?`;
-    db.query(sql, [studentId], (err, results) => {
-        if (err) return res.status(500).json({ message: "DB Error", error: err });
-        res.status(200).json(results);
-    });
+
+    const student = await Student.findById(studentId).populate("attendance.menuId");
+
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    const attendance = student.attendance.map((att) => ({
+      date: att.date,
+      mealType: att.mealType,
+      status: att.status,
+      menuItems: att.menuId?.items || null,
+    }));
+
+    res.status(200).json(attendance);
+
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error });
+  }
 };
 
-// ✅ Update attendance
-exports.updateAttendance = (req, res) => {
-    const { id } = req.params;
+// update attendance 
+
+exports.updateAttendance = async (req, res) => {
+  try {
+    const { id } = req.params; // attendance subdocument id
     const { status } = req.body;
 
-    if (!status) return res.status(400).json({ message: "Status is required" });
+    if (!status) {
+      return res.status(400).json({ message: "Status is required" });
+    }
 
-    const sql = "UPDATE ATTENDANCE SET status = ? WHERE attendance_id = ?";
-    db.query(sql, [status, id], (err, result) => {
-        if (err) return res.status(500).json({ message: "DB Error", error: err });
-        if (result.affectedRows === 0) return res.status(404).json({ message: "Attendance record not found" });
-        res.status(200).json({ message: "Attendance updated successfully" });
+    const student = await Student.findOne({
+      "attendance._id": id,
     });
+
+    if (!student) {
+      return res.status(404).json({ message: "Attendance not found" });
+    }
+
+    const attendance = student.attendance.id(id);
+    attendance.status = status;
+
+    await student.save();
+
+    res.status(200).json({ message: "Attendance updated successfully" });
+
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error });
+  }
 };
 
-// ✅ Delete attendance
-exports.deleteAttendance = (req, res) => {
+// delete attendance 
+
+exports.deleteAttendance = async (req, res) => {
+  try {
     const { id } = req.params;
-    const sql = "DELETE FROM ATTENDANCE WHERE attendance_id = ?";
-    db.query(sql, [id], (err, result) => {
-        if (err) return res.status(500).json({ message: "DB Error", error: err });
-        if (result.affectedRows === 0) return res.status(404).json({ message: "Attendance record not found" });
-        res.status(200).json({ message: "Attendance deleted successfully" });
+
+    const student = await Student.findOne({
+      "attendance._id": id,
     });
+
+    if (!student) {
+      return res.status(404).json({ message: "Attendance not found" });
+    }
+
+    student.attendance = student.attendance.filter(
+      (att) => att._id.toString() !== id
+    );
+
+    await student.save();
+
+    res.status(200).json({ message: "Attendance deleted successfully" });
+
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error });
+  }
 };

@@ -1,105 +1,151 @@
+const Invoice = require("../../models/Invoice");
 
-const db = require("../../config/Database");
+// create invoice
 
-// Create new invoice
-exports.createInvoice = (req, res) => {
-    const { student_id, amount, due_date, status } = req.body;
+exports.createInvoice = async (req, res) => {
+    try {
+        const { student_id, amount, due_date, status } = req.body;
 
-    if (!student_id || !amount || !due_date) {
-        return res.status(400).json({ error: "Student ID, amount, and due date are required" });
+        if (!student_id || !amount || !due_date) {
+            return res.status(400).json({
+                error: "Student ID, amount, and due date are required"
+            });
+        }
+
+        const invoice = await Invoice.create({
+            student_id,
+            amount,
+            due_date,
+            status: status || "unpaid"
+        });
+
+        res.status(201).json({
+            message: "Invoice created successfully",
+            invoiceId: invoice._id
+        });
+
+    } catch (err) {
+        console.error("Error creating invoice:", err);
+        res.status(500).json({ error: "Database error" });
     }
-
-    const sql = "INSERT INTO invoice (student_id, amount, due_date, status) VALUES (?, ?, ?, ?)";
-    db.query(sql, [student_id, amount, due_date, status || "unpaid"], (err, result) => {
-        if (err) {
-            console.error("Error inserting invoice:", err);
-            return res.status(500).json({ error: "Database error" });
-        }
-        res.status(201).json({ message: "Invoice created successfully", invoiceId: result.insertId });
-    });
 };
 
-// Get all invoices
-exports.getAllInvoices = (req, res) => {
-    const sql = `
-        SELECT i.id, i.amount, i.due_date, i.status, i.created_at, 
-               s.name AS student_name, s.email AS student_email
-        FROM invoice i 
-        JOIN student s ON i.student_id = s.id
-        ORDER BY i.created_at DESC
-    `;
-    db.query(sql, (err, results) => {
-        if (err) {
-            console.error("Error fetching invoices:", err);
-            return res.status(500).json({ error: "Database error" });
-        }
-        res.status(200).json(results);
-    });
-};
+// get all invoice 
 
-// Get invoice by ID
-exports.getInvoiceById = (req, res) => {
-    const { id } = req.params;
-    const sql = "SELECT * FROM invoice WHERE id = ?";
-    db.query(sql, [id], (err, result) => {
-        if (err) {
-            console.error("Error fetching invoice:", err);
-            return res.status(500).json({ error: "Database error" });
-        }
-        if (result.length === 0) {
-            return res.status(404).json({ error: "Invoice not found" });
-        }
-        res.status(200).json(result[0]);
-    });
-};
+exports.getAllInvoices = async (req, res) => {
+    try {
+        const invoices = await Invoice.find()
+            .populate("student_id", "name email") // like JOIN
+            .sort({ createdAt: -1 });
 
-// Get invoices by student
-exports.getInvoicesByStudent = (req, res) => {
-    const { studentId } = req.params;
-    const sql = "SELECT * FROM invoice WHERE student_id = ? ORDER BY created_at DESC";
-    db.query(sql, [studentId], (err, results) => {
-        if (err) {
-            console.error("Error fetching student invoices:", err);
-            return res.status(500).json({ error: "Database error" });
-        }
-        res.status(200).json(results);
-    });
-};
+        const formatted = invoices.map(inv => ({
+            id: inv._id,
+            amount: inv.amount,
+            due_date: inv.due_date,
+            status: inv.status,
+            created_at: inv.createdAt,
+            student_name: inv.student_id?.name,
+            student_email: inv.student_id?.email
+        }));
 
-// Update invoice status (paid/unpaid)
-exports.updateInvoiceStatus = (req, res) => {
-    const { id } = req.params;
-    const { status } = req.body;
+        res.status(200).json(formatted);
 
-    if (!status) {
-        return res.status(400).json({ error: "Status is required" });
+    } catch (err) {
+        console.error("Error fetching invoices:", err);
+        res.status(500).json({ error: "Database error" });
     }
-
-    const sql = "UPDATE invoice SET status = ? WHERE id = ?";
-    db.query(sql, [status, id], (err, result) => {
-        if (err) {
-            console.error("Error updating invoice:", err);
-            return res.status(500).json({ error: "Database error" });
-        }
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: "Invoice not found" });
-        }
-        res.status(200).json({ message: "Invoice status updated successfully" });
-    });
 };
 
-// Delete invoice
-exports.deleteInvoice = (req, res) => {
-    const { id } = req.params;
-    const sql = "DELETE FROM invoice WHERE id = ?";
-    db.query(sql, [id], (err, result) => {
-        if (err) {
-            console.error("Error deleting invoice:", err);
-            return res.status(500).json({ error: "Database error" });
-        }
-        if (result.affectedRows === 0) {
+// get invoice by invoice id
+
+exports.getInvoiceById = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const invoice = await Invoice.findById(id);
+
+        if (!invoice) {
             return res.status(404).json({ error: "Invoice not found" });
         }
-        res.status(200).json({ message: "Invoice deleted successfully" });
-    });
+
+        res.status(200).json(invoice);
+
+    } catch (err) {
+        console.error("Error fetching invoice:", err);
+        res.status(500).json({ error: "Database error" });
+    }
 };
+
+
+// get invoices by student
+
+exports.getInvoicesByStudent = async (req, res) => {
+    try {
+        const { studentId } = req.params;
+
+        const invoices = await Invoice.find({ student_id: studentId })
+            .sort({ createdAt: -1 });
+
+        res.status(200).json(invoices);
+
+    } catch (err) {
+        console.error("Error fetching student invoices:", err);
+        res.status(500).json({ error: "Database error" });
+    }
+};
+
+
+// update invoice status
+
+exports.updateInvoiceStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+
+        if (!status) {
+            return res.status(400).json({ error: "Status is required" });
+        }
+
+        const updatedInvoice = await Invoice.findByIdAndUpdate(
+            id,
+            { status },
+            { new: true }
+        );
+
+        if (!updatedInvoice) {
+            return res.status(404).json({ error: "Invoice not found" });
+        }
+
+        res.status(200).json({
+            message: "Invoice status updated successfully"
+        });
+
+    } catch (err) {
+        console.error("Error updating invoice:", err);
+        res.status(500).json({ error: "Database error" });
+    }
+};
+
+
+// delete invoice 
+
+exports.deleteInvoice = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const deleted = await Invoice.findByIdAndDelete(id);
+
+        if (!deleted) {
+            return res.status(404).json({ error: "Invoice not found" });
+        }
+
+        res.status(200).json({
+            message: "Invoice deleted successfully"
+        });
+
+    } catch (err) {
+        console.error("Error deleting invoice:", err);
+        res.status(500).json({ error: "Database error" });
+    }
+};
+

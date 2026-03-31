@@ -1,61 +1,125 @@
+const Student = require("../../models/Student");
 
-const db = require("../../config/Database");
+// give feedback
 
-// Add new feedback
-exports.createFeedback = (req, res) => {
+exports.createFeedback = async (req, res) => {
+  try {
     const { student_id, message, rating } = req.body;
 
     if (!student_id || !message) {
-        return res.status(400).json({ error: "Student ID and message are required" });
+      return res.status(400).json({
+        error: "Student ID and message are required"
+      });
     }
 
-    const sql = "INSERT INTO feedback (message, rating, submitted_at, student_id) VALUES (?, ?, NOW(), ?)";
-    db.query(sql, [message, rating || null, student_id], (err, result) => {
-        if (err) {
-            console.error("Error inserting feedback:", err);
-            return res.status(500).json({ error: "Database error" });
-        }
-        res.status(201).json({ message: "Feedback submitted successfully", feedbackId: result.insertId });
+    const student = await Student.findById(student_id);
+
+    if (!student) {
+      return res.status(404).json({ error: "Student not found" });
+    }
+
+    student.feedbacks.push({
+      message,
+      rating: rating || null,
+      submittedAt: new Date()
     });
+
+    await student.save();
+
+    res.status(201).json({
+      message: "Feedback submitted successfully"
+    });
+
+  } catch (error) {
+    console.error("Error inserting feedback:", error);
+    res.status(500).json({ error: "Server error" });
+  }
 };
 
-// Get all feedback
-exports.getAllFeedback = (req, res) => {
-    const sql = "SELECT f.feedback_id, f.message, f.rating, f.submitted_at, s.name AS student_name FROM feedback f JOIN student s ON f.student_id = s.student_id ORDER BY f.submitted_at DESC";
-    db.query(sql, (err, results) => {
-        if (err) {
-            console.error("Error fetching feedback:", err);
-            return res.status(500).json({ error: "Database error" });
-        }
-        res.status(200).json(results);
+// get all feedback
+
+exports.getAllFeedback = async (req, res) => {
+  try {
+    const students = await Student.find();
+
+    let allFeedback = [];
+
+    students.forEach((student) => {
+      student.feedbacks.forEach((f) => {
+        allFeedback.push({
+          feedbackId: f._id,
+          studentId: student._id,
+          studentName: student.name,
+          message: f.message,
+          rating: f.rating,
+          submittedAt: f.submittedAt
+        });
+      });
     });
+
+    // Sort DESC like SQL
+    allFeedback.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+
+    res.status(200).json(allFeedback);
+
+  } catch (error) {
+    console.error("Error fetching feedback:", error);
+    res.status(500).json({ error: "Server error" });
+  }
 };
 
-// Get feedback by student
-exports.getFeedbackByStudent = (req, res) => {
+// get feedback by student 
+
+exports.getFeedbackByStudent = async (req, res) => {
+  try {
     const { studentId } = req.params;
-    const sql = "SELECT * FROM feedback WHERE student_id = ? ORDER BY created_at DESC";
-    db.query(sql, [studentId], (err, results) => {
-        if (err) {
-            console.error("Error fetching feedback:", err);
-            return res.status(500).json({ error: "Database error" });
-        }
-        res.status(200).json(results);
-    });
+
+    const student = await Student.findById(studentId);
+
+    if (!student) {
+      return res.status(404).json({ error: "Student not found" });
+    }
+
+    // Sort DESC
+    const feedback = student.feedbacks.sort(
+      (a, b) => new Date(b.submittedAt) - new Date(a.submittedAt)
+    );
+
+    res.status(200).json(feedback);
+
+  } catch (error) {
+    console.error("Error fetching feedback:", error);
+    res.status(500).json({ error: "Server error" });
+  }
 };
 
-// Delete feedback
-exports.deleteFeedback = (req, res) => {
-    const { id } = req.params;
-    const sql = "DELETE FROM feedback WHERE id = ?";
-    db.query(sql, [id], (err, result) => {
-        if (err) {
-            console.error("Error deleting feedback:", err);
-            return res.status(500).json({ error: "Database error" });
-        }
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: "Feedback not found" });
-        }
-        res.status(200).json({ message: "Feedback deleted successfully" });
+// delete feedback
+
+exports.deleteFeedback = async (req, res) => {
+  try {
+    const { id } = req.params; // feedbackId
+
+    const student = await Student.findOne({
+      "feedbacks._id": id
     });
+
+    if (!student) {
+      return res.status(404).json({ error: "Feedback not found" });
+    }
+
+    student.feedbacks = student.feedbacks.filter(
+      (f) => f._id.toString() !== id
+    );
+
+    await student.save();
+
+    res.status(200).json({
+      message: "Feedback deleted successfully"
+    });
+
+  } catch (error) {
+    console.error("Error deleting feedback:", error);
+    res.status(500).json({ error: "Server error" });
+  }
 };
+

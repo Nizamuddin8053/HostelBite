@@ -1,100 +1,103 @@
+const Menu = require("../../models/Menu");
 
-const db = require("../../config/Database");
+// Add new menu (weekly)
+exports.createMenu = async (req, res) => {
+  try {
+    const { mealType, menuItems, managementId } = req.body;
 
-// Add new menu item
-exports.createMenu = (req, res) => {
-    
-    const { meal_type, menuItems } = req.body;
-    // menuItems = [{ day: "Monday", items: "Poha, Tea" }, ...]
-
-    if (!meal_type || !Array.isArray(menuItems) || menuItems.length === 0) {
-        return res.status(400).json({ error: "Meal type and menu items are required" });
+    if (!mealType || !Array.isArray(menuItems) || menuItems.length === 0) {
+      return res.status(400).json({ error: "Meal type and menu items are required" });
     }
 
-    // Step 1: Check if meal type already exists
-    const checkSql = "SELECT COUNT(*) AS count FROM menu WHERE meal_type = ?";
-    db.query(checkSql, [meal_type], (err, results) => {
-        if (err) {
-            console.error("Error checking menu:", err);
-            return res.status(500).json({ error: "Database error" });
-        }
+    // Check if mealType already exists
+    const existing = await Menu.findOne({ mealType });
+    if (existing) {
+      return res.status(400).json({ error: `${mealType} menu already added` });
+    }
 
-        if (results[0].count > 0) {
-            return res.status(400).json({ error: `${meal_type} menu already added` });
-        }
+    // Insert all days
+    const menuData = menuItems.map(item => ({
+      day: item.day,
+      mealType,
+      items: item.items,
+      managementId
+    }));
 
-        // Step 2: Insert all 7 day records
-        const sql = "INSERT INTO menu (day, meal_type, items) VALUES ?";
-        const values = menuItems.map((m) => [m.day, meal_type, m.items]);
+    await Menu.insertMany(menuData);
 
-        db.query(sql, [values], (err, result) => {
-            if (err) {
-                console.error("Error inserting weekly menu:", err);
-                return res.status(500).json({ error: "Database error" });
-            }
-            res.status(201).json({ message: `${meal_type} menu added successfully` });
-        });
-    });
+    res.status(201).json({ message: `${mealType} menu added successfully` });
+
+  } catch (error) {
+    console.error("Error creating menu:", error);
+    res.status(500).json({ error: "Server error" });
+  }
 };
 
-// Get all menu items
-exports.getAllMenu = (req, res) => {
-    const sql = "SELECT * FROM menu ORDER BY day, meal_type";
-    db.query(sql, (err, results) => {
-        if (err) {
-            console.error("Error fetching menu:", err);
-            return res.status(500).json({ error: "Database error" });
-        }
-        res.status(200).json(results);
-    });
+
+exports.getAllMenu = async (req, res) => {
+  try {
+    const menu = await Menu.find().sort({ day: 1, mealType: 1 });
+    res.status(200).json(menu);
+  } catch (error) {
+    console.error("Error fetching menu:", error);
+    res.status(500).json({ error: "Server error" });
+  }
 };
 
-// Get menu by ID
-exports.getMenuById = (req, res) => {
-    const { id } = req.params;
-    const sql = "SELECT * FROM menu WHERE id = ?";
-    db.query(sql, [id], (err, result) => {
-        if (err) {
-            console.error("Error fetching menu:", err);
-            return res.status(500).json({ error: "Database error" });
-        }
-        if (result.length === 0) {
-            return res.status(404).json({ error: "Menu not found" });
-        }
-        res.status(200).json(result[0]);
-    });
+
+exports.getMenuById = async (req, res) => {
+  try {
+    const menu = await Menu.findById(req.params.id);
+
+    if (!menu) {
+      return res.status(404).json({ error: "Menu not found" });
+    }
+
+    res.status(200).json(menu);
+
+  } catch (error) {
+    console.error("Error fetching menu:", error);
+    res.status(500).json({ error: "Server error" });
+  }
 };
 
-// Update menu item
-exports.updateMenu = (req, res) => {
-    
-    const { day, meal_type, items } = req.body;
 
-    const sql = "UPDATE menu SET meal_type = ?, items = ? WHERE day = ?";
-    db.query(sql, [meal_type, items, day], (err, result) => {
-        if (err) {
-            console.error("Error updating menu:", err);
-            return res.status(500).json({ error: "Database error" });
-        }
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: "Menu not found" });
-        }
-        res.status(200).json({ message: "Menu updated successfully" });
-    });
+exports.updateMenu = async (req, res) => {
+  try {
+    const { mealType, items, day } = req.body;
+
+    const updatedMenu = await Menu.findByIdAndUpdate(
+      req.params.id,
+      { mealType, items, day },
+      { new: true }
+    );
+
+    if (!updatedMenu) {
+      return res.status(404).json({ error: "Menu not found" });
+    }
+
+    res.status(200).json({ message: "Menu updated successfully", data: updatedMenu });
+
+  } catch (error) {
+    console.error("Error updating menu:", error);
+    res.status(500).json({ error: "Server error" });
+  }
 };
 
-// Delete menu item
-exports.deleteMenu = (req, res) => {
-    
-    const sql = "DELETE FROM menu";
-    db.query(sql, (err, result) => {
-        if (err) {
-            console.error("Error deleting menu:", err);
-            return res.status(500).json({ error: "Database error" });
-        }
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: "Menu not found" });
-        }
-        res.status(200).json({ message: "Menu deleted successfully" });
-    });
+
+exports.deleteMenu = async (req, res) => {
+  try {
+    const result = await Menu.deleteMany();
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ error: "Menu not found" });
+    }
+
+    res.status(200).json({ message: "All menu deleted successfully" });
+
+  } catch (error) {
+    console.error("Error deleting menu:", error);
+    res.status(500).json({ error: "Server error" });
+  }
 };
+

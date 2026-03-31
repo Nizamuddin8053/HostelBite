@@ -26,7 +26,7 @@ pipeline {
         stage('Install Frontend') {
             steps {
                 dir("${FRONTEND_DIR}") {
-                    sh 'npm install'
+                    bat 'npm install'
                 }
             }
         }
@@ -34,7 +34,7 @@ pipeline {
         stage('Build Frontend'){
             steps {
                 dir("${FRONTEND_DIR}"){
-                    sh 'npm run build'
+                    bat 'npm run build'
                 }
             }
         }
@@ -42,7 +42,7 @@ pipeline {
         stage('Install Backend') {
             steps {
                 dir("${BACKEND_DIR}") {
-                    sh 'npm install'
+                    bat 'npm install'
                 }
             }
         }
@@ -50,14 +50,14 @@ pipeline {
         stage('Test Backend') {
             steps {
                 dir("${BACKEND_DIR}") {
-                    sh 'echo "Add tests later"'
+                    bat 'echo "Add tests later"'
                 }
             }
         }
 
         stage('Deploy Frontend on Vercel'){
             steps {
-                sh '''
+                bat '''
                 npm install -g vercel
                 vercel --prod --token=$VERCEL_TOKEN --confirm
                 '''
@@ -66,7 +66,7 @@ pipeline {
 
         stage('Deploy Backend on Render') {
             steps {
-                sh '''
+                bat '''
                 curl -X POST $RENDER_DEPLOY_HOOK
                 '''
             }

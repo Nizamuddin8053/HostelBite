@@ -8,21 +8,23 @@ const {
     deleteStaff
 } = require("../controllers/Staff/staffController");
 
+const {auth,isStudent, isAdmin}  = require("../middlewares/auth");
+
 const router = express.Router();
 
 // Create staff
-router.post("/", createStaff);
+router.post("/", auth, isAdmin, createStaff);
 
 // Get all staff
-router.get("/", getAllStaff);
+router.get("/", auth, isAdmin, getAllStaff);
 
 // Get staff by ID
-router.get("/:id", getStaffById);
+router.get("/:id",  getStaffById);
 
 // Update staff
-router.put("/:id", updateStaff);
+router.put("/:id",  updateStaff);
 
 // Delete staff
-router.delete("/:id", deleteStaff);
+router.delete("/:id",  deleteStaff);
 
 module.exports = router;

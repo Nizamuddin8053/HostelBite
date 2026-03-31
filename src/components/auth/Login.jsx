@@ -41,12 +41,25 @@ const LoginForm = () => {
                 }
             );
 
+
+            // fetch name to say welcome
+            // const userRes = await axios.get("http://localhost:4000/api/profile/me", {
+            //     headers: {
+            //         Authorization: `Bearer ${response.data.token}`
+            //     }
+            // });
+
+
             // when we are log in add token and role to localstorage
 
 
-            console.log(" Login response:", response.data);
+            // console.log(" Login response:", response.data);
             localStorage.setItem("token", response.data.token);
             localStorage.setItem("role", response.data.role);
+
+            // store name
+            // localStorage.setItem("name", userRes.data.name);
+
             alert("Login successful!");
             
 

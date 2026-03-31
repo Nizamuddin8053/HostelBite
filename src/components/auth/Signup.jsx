@@ -10,7 +10,7 @@ const SignupForm = () => {
         password: "",
         confirmPassword: "",
         role: "",
-        room_number: "",
+        roomNumber: "",
         staffRole: "",
         course: "",
         year: "",
@@ -76,7 +76,7 @@ const SignupForm = () => {
             alert(error.response?.data?.message || "Signup failed!");
         }
 
-        console.log("Form Submitted:", formData);
+        // console.log("Form Submitted:", formData);
     };
 
     const { role } = formData;
@@ -179,8 +179,8 @@ const SignupForm = () => {
                             </label>
                             <input
                                 type="text"
-                                name="room_number"
-                                value={formData.room_number}
+                                name="roomNumber"
+                                value={formData.roomNumber}
                                 onChange={handleChange}
                                 placeholder="Enter room number"
                                 className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"

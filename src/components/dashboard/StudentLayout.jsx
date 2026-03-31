@@ -7,7 +7,8 @@ const StudentLayout = () => {
         <div className="flex min-h-screen bg-gray-100">
             <Sidebar role="student" />
             <div className="flex-1 p-6">
-                <Outlet /> {/* Here the right-side page will render */}
+                {/* right side of page */}
+                <Outlet /> 
             </div>
         </div>
     );

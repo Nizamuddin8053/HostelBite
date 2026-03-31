@@ -14,7 +14,7 @@ const generateQRCode = async () => {
         const qrImageUrl = await QRCode.toDataURL(qrPayload);
 
         latestQR = { codeData: { token: uniqueData, time: timestamp }, qrUrl: qrImageUrl };
-        console.log("✅ QR Updated at:", timestamp);
+        console.log(" QR Updated at:", timestamp);
     } catch (error) {
         console.error("QR generation failed:", error);
     }

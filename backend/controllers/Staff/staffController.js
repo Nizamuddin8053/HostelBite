@@ -1,82 +1,125 @@
-
-const db = require("../../config/Database");
+const Staff = require("../../models/Staff");
 
 // Create new staff
-exports.createStaff = (req, res) => {
-    const { name, email, phone, role, salary } = req.body;
+exports.createStaff = async (req, res) => {
+  try {
+    const { name, role,  email, password, salary } = req.body;
 
-    if (!name || !email || !role) {
-        return res.status(400).json({ error: "Name, email, and role are required" });
+    if (!name || !role || !email  || !password) {
+      return res.status(400).json({
+        error: "Name, role , email and password are required",
+      });
     }
 
-    const sql = "INSERT INTO staff (name, email, phone, role, salary) VALUES (?, ?, ?, ?, ?)";
-    db.query(sql, [name, email, phone || null, role, salary || 0], (err, result) => {
-        if (err) {
-            console.error("Error inserting staff:", err);
-            return res.status(500).json({ error: "Database error" });
-        }
-        res.status(201).json({ message: "Staff added successfully", staffId: result.insertId });
+    //  Check duplicate email
+    const existingStaff = await Staff.findOne({ email });
+    if (existingStaff) {
+      return res.status(400).json({ error: "Staff already exists" });
+    }
+
+    const staff = await Staff.create({
+      name,
+      role,
+      email,
+      password,
+      salaryAmount: salary || 0,
     });
+
+    res.status(201).json({
+      message: "Staff added successfully",
+      staffId: staff._id,
+    });
+
+  } catch (err) {
+    console.error("Error inserting staff:", err);
+    res.status(500).json({ error: "Database error" });
+  }
 };
 
+
 // Get all staff
-exports.getAllStaff = (req, res) => {
-    const sql = "SELECT * FROM staff ORDER BY created_at DESC";
-    db.query(sql, (err, results) => {
-        if (err) {
-            console.error("Error fetching staff:", err);
-            return res.status(500).json({ error: "Database error" });
-        }
-        res.status(200).json(results);
-    });
+exports.getAllStaff = async (req, res) => {
+  try {
+    const staff = await Staff.find().sort({ createdAt: -1 });
+
+    res.status(200).json(staff);
+  } catch (err) {
+    console.error("Error fetching staff:", err);
+    res.status(500).json({ error: "Database error" });
+  }
 };
 
 // Get staff by ID
-exports.getStaffById = (req, res) => {
+exports.getStaffById = async (req, res) => {
+  try {
     const { id } = req.params;
-    const sql = "SELECT * FROM staff WHERE id = ?";
-    db.query(sql, [id], (err, result) => {
-        if (err) {
-            console.error("Error fetching staff:", err);
-            return res.status(500).json({ error: "Database error" });
-        }
-        if (result.length === 0) {
-            return res.status(404).json({ error: "Staff not found" });
-        }
-        res.status(200).json(result[0]);
-    });
+
+    const staff = await Staff.findById(id);
+
+    if (!staff) {
+      return res.status(404).json({ error: "Staff not found" });
+    }
+
+    res.status(200).json(staff);
+
+  } catch (err) {
+    console.error("Error fetching staff:", err);
+    res.status(500).json({ error: "Database error" });
+  }
 };
+
 
 // Update staff details
-exports.updateStaff = (req, res) => {
+exports.updateStaff = async (req, res) => {
+  try {
     const { id } = req.params;
-    const { name, email, phone, role, salary } = req.body;
+    const { name, role, email, password, salary } = req.body;
 
-    const sql = "UPDATE staff SET name = ?, email = ?, phone = ?, role = ?, salary = ? WHERE id = ?";
-    db.query(sql, [name, email, phone, role, salary, id], (err, result) => {
-        if (err) {
-            console.error("Error updating staff:", err);
-            return res.status(500).json({ error: "Database error" });
-        }
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: "Staff not found" });
-        }
-        res.status(200).json({ message: "Staff updated successfully" });
+    const updatedStaff = await Staff.findByIdAndUpdate(
+      id,
+      {
+        name,
+        role,
+        email,
+        password,
+        salaryAmount: salary,
+      },
+      { new: true }
+    );
+
+    if (!updatedStaff) {
+      return res.status(404).json({ error: "Staff not found" });
+    }
+
+    res.status(200).json({
+      message: "Staff updated successfully",
+      data: updatedStaff,
     });
+
+  } catch (err) {
+    console.error("Error updating staff:", err);
+    res.status(500).json({ error: "Database error" });
+  }
 };
 
+
 // Delete staff
-exports.deleteStaff = (req, res) => {
+exports.deleteStaff = async (req, res) => {
+  try {
     const { id } = req.params;
-    const sql = "DELETE FROM staff WHERE id = ?";
-    db.query(sql, [id], (err, result) => {
-        if (err) {
-            console.error("Error deleting staff:", err);
-            return res.status(500).json({ error: "Database error" });
-        }
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: "Staff not found" });
-        }
-        res.status(200).json({ message: "Staff deleted successfully" });
+
+    const deletedStaff = await Staff.findByIdAndDelete(id);
+
+    if (!deletedStaff) {
+      return res.status(404).json({ error: "Staff not found" });
+    }
+
+    res.status(200).json({
+      message: "Staff deleted successfully",
     });
+
+  } catch (err) {
+    console.error("Error deleting staff:", err);
+    res.status(500).json({ error: "Database error" });
+  }
 };

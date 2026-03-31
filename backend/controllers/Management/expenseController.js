@@ -1,105 +1,151 @@
+const Expense = require("../../models/Expense");
 
-const db = require("../../config/Database");
 
-// Add new expense
-exports.createExpense = (req, res) => {
-    const { title, category, date, description, qty, rate_kg, amount, management_id } = req.body;
+exports.createExpense = async (req, res) => {
+  try {
+    const { title, category, date, description, qty, rateKg, managementId } = req.body;
 
-    if (!title || !qty || !rate_kg || !category || !date) {
-        return res.status(400).json({ error: "Title, quantity, rate per kg, category, and date are required" });
+    if (!title || !qty || !rateKg || !category || !date) {
+      return res.status(400).json({
+        error: "Title, quantity, rateKg, category, and date are required"
+      });
     }
 
-    const sql = "INSERT INTO expenses (category, amount, date, description, management_id, title, qty, rate_kg) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-    db.query(sql, [category, rate_kg*qty, date, description || null, management_id, title, qty, rate_kg], (err, result) => {
-        if (err) {
-            console.error("Error inserting expense:", err);
-            return res.status(500).json({ error: "Database error" });
-        }
-        res.status(201).json({ message: "Expense added successfully", expenseId: result.insertId });
+    const amount = qty * rateKg;
+
+    const newExpense = await Expense.create({
+      title,
+      category,
+      date,
+      description,
+      qty,
+      rateKg,
+      amount,
+      managementId
     });
-};
 
-// Get all expenses
-exports.getAllExpenses = (req, res) => {
-    const allExpensesSql = "SELECT * FROM expenses ORDER BY date DESC";
-    const totalAmountSql = "SELECT SUM(amount) AS totalAmount FROM expenses";
-    const categoryBreakdownSql = "SELECT category, SUM(amount) AS categoryTotal FROM expenses GROUP BY category";
-
-    db.query(allExpensesSql, (err, expenses) => {
-        if (err) {
-            console.error("Error fetching expenses:", err);
-            return res.status(500).json({ error: "Database error while fetching expenses" });
-        }
-
-        db.query(totalAmountSql, (err, totalResult) => {
-            if (err) {
-                console.error("Error fetching total amount:", err);
-                return res.status(500).json({ error: "Database error while fetching total amount" });
-            }
-
-            db.query(categoryBreakdownSql, (err, categoryResults) => {
-                if (err) {
-                    console.error("Error fetching category breakdown:", err);
-                    return res.status(500).json({ error: "Database error while fetching category breakdown" });
-                }
-
-                res.status(200).json({
-                    expenses,
-                    totalAmount: totalResult[0]?.totalAmount || 0,
-                    categoryBreakdown: categoryResults
-                });
-            });
-        });
+    res.status(201).json({
+      message: "Expense added successfully",
+      expenseId: newExpense._id
     });
+
+  } catch (error) {
+    console.error("Error creating expense:", error);
+    res.status(500).json({ error: "Server error" });
+  }
 };
 
 
-// Get expense by ID
-exports.getExpenseById = (req, res) => {
-    const { expense_id } = req.body;
-    const sql = "SELECT * FROM expenses WHERE expense_id = ?";
-    db.query(sql, [expense_id], (err, result) => {
-        if (err) {
-            console.error("Error fetching expense:", err);
-            return res.status(500).json({ error: "Database error" });
+exports.getAllExpenses = async (req, res) => {
+  try {
+    // 1. Get all expenses
+    const expenses = await Expense.find().sort({ date: -1 });
+
+    // 2. Total Amount
+    const totalResult = await Expense.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalAmount: { $sum: "$amount" }
         }
-        if (result.length === 0) {
-            return res.status(404).json({ error: "Expense not found" });
+      }
+    ]);
+
+    // 3. Category Breakdown
+    const categoryBreakdown = await Expense.aggregate([
+      {
+        $group: {
+          _id: "$category",
+          categoryTotal: { $sum: "$amount" }
         }
-        res.status(200).json(result[0]);
+      },
+      {
+        $project: {
+          _id: 0,
+          category: "$_id",
+          categoryTotal: 1
+        }
+      }
+    ]);
+
+    res.status(200).json({
+      expenses,
+      totalAmount: totalResult[0]?.totalAmount || 0,
+      categoryBreakdown
     });
+
+  } catch (error) {
+    console.error("Error fetching expenses:", error);
+    res.status(500).json({ error: "Server error" });
+  }
 };
 
-// Update expense
-exports.updateExpense = (req, res) => {
-    const { id } = req.params;
-    const { title, amount, category, date, description } = req.body;
 
-    const sql = "UPDATE expenses SET title = ?, amount = ?, category = ?, date = ?, description = ? WHERE id = ?";
-    db.query(sql, [title, amount, category, date, description || null, id], (err, result) => {
-        if (err) {
-            console.error("Error updating expense:", err);
-            return res.status(500).json({ error: "Database error" });
-        }
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: "Expense not found" });
-        }
-        res.status(200).json({ message: "Expense updated successfully" });
-    });
+exports.getExpenseById = async (req, res) => {
+  try {
+    const expense = await Expense.findById(req.params.id);
+
+    if (!expense) {
+      return res.status(404).json({ error: "Expense not found" });
+    }
+
+    res.status(200).json(expense);
+
+  } catch (error) {
+    console.error("Error fetching expense:", error);
+    res.status(500).json({ error: "Server error" });
+  }
 };
 
-// Delete expense
-exports.deleteExpense = (req, res) => {
-    const { id } = req.params;
-    const sql = "DELETE FROM expenses WHERE id = ?";
-    db.query(sql, [id], (err, result) => {
-        if (err) {
-            console.error("Error deleting expense:", err);
-            return res.status(500).json({ error: "Database error" });
-        }
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: "Expense not found" });
-        }
-        res.status(200).json({ message: "Expense deleted successfully" });
+
+exports.updateExpense = async (req, res) => {
+  try {
+    const { title, category, date, description, qty, rateKg } = req.body;
+
+    let updateData = { title, category, date, description };
+
+    // If qty or rateKg updated → recalculate amount
+    if (qty && rateKg) {
+      updateData.qty = qty;
+      updateData.rateKg = rateKg;
+      updateData.amount = qty * rateKg;
+    }
+
+    const updated = await Expense.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ error: "Expense not found" });
+    }
+
+    res.status(200).json({
+      message: "Expense updated successfully",
+      data: updated
     });
+
+  } catch (error) {
+    console.error("Error updating expense:", error);
+    res.status(500).json({ error: "Server error" });
+  }
 };
+
+
+exports.deleteExpense = async (req, res) => {
+  try {
+    const deleted = await Expense.findByIdAndDelete(req.params.id);
+
+    if (!deleted) {
+      return res.status(404).json({ error: "Expense not found" });
+    }
+
+    res.status(200).json({ message: "Expense deleted successfully" });
+
+  } catch (error) {
+    console.error("Error deleting expense:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+

@@ -1,148 +1,167 @@
+const Notification = require("../../models/Notification");
+const Student = require("../../models/Student");
 
-const db = require("../../config/Database");
-
-
-//  Create notification (to single user, multiple users, or all)
-
-exports.createNotification = (req, res) => {
+// Create notification
+exports.createNotification = async (req, res) => {
+  try {
     const { targetType, student_id, course, year, title, message } = req.body;
 
     if (!title || !message) {
-        return res.status(400).json({ error: "Title and message are required" });
+      return res.status(400).json({
+        error: "Title and message are required",
+      });
     }
 
-    let sql;
-    let params = [];
+    let notifications = [];
 
-    // 🧍 Send to a single student
+    // 🧍 Single student
     if (targetType === "single") {
-        if (!student_id) {
-            return res.status(400).json({ error: "Student ID is required for single notification" });
-        }
-        sql = `
-            INSERT INTO notifications (student_id, title, message, sent_at)
-            VALUES (?, ?, ?, NOW())
-        `;
-        params = [student_id, title, message];
+      if (!student_id) {
+        return res.status(400).json({
+          error: "Student ID is required",
+        });
+      }
+
+      notifications.push({
+        studentId: student_id,
+        title,
+        message,
+      });
     }
 
-    // 👥 Send to all students of a particular course & year
+    //  Group (course + year)
     else if (targetType === "group") {
-        if (!course || !year) {
-            return res.status(400).json({ error: "Course and year are required for group notifications" });
-        }
-        sql = `
-            INSERT INTO notifications (student_id, title, message, sent_at)
-            SELECT student_id, ?, ?, NOW() FROM student
-            WHERE course = ? AND year = ?
-        `;
-        params = [title, message, course, year];
+      if (!course || !year) {
+        return res.status(400).json({
+          error: "Course and year are required",
+        });
+      }
+
+      const students = await Student.find({ course, year }, "_id");
+
+      notifications = students.map((student) => ({
+        studentId: student._id,
+        title,
+        message,
+      }));
     }
 
-    // 🌎 Send to all students
+    // All students
     else if (targetType === "all") {
-        sql = `
-            INSERT INTO notifications (student_id, title, message, sent_at)
-            SELECT student_id, ?, ?, NOW() FROM student
-        `;
-        params = [title, message];
+      const students = await Student.find({}, "_id");
+
+      notifications = students.map((student) => ({
+        studentId: student._id,
+        title,
+        message,
+      }));
     }
 
     else {
-        return res.status(400).json({ error: "Invalid targetType" });
+      return res.status(400).json({ error: "Invalid targetType" });
     }
 
-    // Execute SQL
-    db.query(sql, params, (err, result) => {
-        if (err) {
-            console.error("❌ Error creating notification:", err);
-            return res.status(500).json({ error: "Database error", details: err });
-        }
+    const result = await Notification.insertMany(notifications);
 
-        res.status(201).json({
-            message: "✅ Notification(s) created successfully",
-            affected: result.affectedRows
-        });
+    res.status(201).json({
+      message: "Notification(s) created successfully",
+      affected: result.length,
     });
+
+  } catch (err) {
+    console.error(" Error creating notification:", err);
+    res.status(500).json({ error: "Database error" });
+  }
 };
-
-
 
 
 // Get all notifications
-exports.getAllNotifications = (req, res) => {
-    const sql = "SELECT * FROM notifications ORDER BY created_at DESC";
-    db.query(sql, (err, results) => {
-        if (err) {
-            console.error("Error fetching notifications:", err);
-            return res.status(500).json({ error: "Database error" });
-        }
-        res.status(200).json(results);
-    });
+exports.getAllNotifications = async (req, res) => {
+  try {
+    const notifications = await Notification.find()
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(notifications);
+
+  } catch (err) {
+    console.error("Error fetching notifications:", err);
+    res.status(500).json({ error: "Database error" });
+  }
 };
 
 // Get notifications by user
-exports.getNotificationsByUser = (req, res) => {
+exports.getNotificationsByUser = async (req, res) => {
+  try {
     const { userId, role } = req.params;
-    console.log(userId,role); 
-    
 
-    let columnName;
+    let query = {};
 
-    if (role === "student") columnName = "student_id";
-    else if (role === "staff") columnName = "staff_id";
-    else if (role === "management") columnName = "management_id";
+    if (role === "student") query.studentId = userId;
+    else if (role === "staff") query.staffId = userId;
+    else if (role === "management") query.managementId = userId;
     else {
-        return res.status(400).json({ error: "Invalid role type" });
+      return res.status(400).json({ error: "Invalid role type" });
     }
 
-    const sql = `
-        SELECT notification_id, title, message, sent_at 
-        FROM notifications 
-        WHERE ${columnName} = ? 
-        ORDER BY sent_at DESC 
-        LIMIT 10
-    `;
+    const notifications = await Notification.find(query)
+      .sort({ sentAt: -1 })
+      .limit(10);
 
-    db.query(sql, [userId], (err, results) => {
-        if (err) {
-            console.error("❌ Error fetching notifications:", err);
-            return res.status(500).json({ error: "Database error" });
-        }
+    res.status(200).json(notifications);
 
-        res.status(200).json(results);
-    });
+  } catch (err) {
+    console.error(" Error fetching notifications:", err);
+    res.status(500).json({ error: "Database error" });
+  }
 };
-
 
 // Mark notification as read
-exports.markAsRead = (req, res) => {
+exports.markAsRead = async (req, res) => {
+  try {
     const { id } = req.params;
-    const sql = "UPDATE notifications SET is_read = 1 WHERE id = ?";
-    db.query(sql, [id], (err, result) => {
-        if (err) {
-            console.error("Error updating notification:", err);
-            return res.status(500).json({ error: "Database error" });
-        }
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: "Notification not found" });
-        }
-        res.status(200).json({ message: "Notification marked as read" });
+
+    const updated = await Notification.findByIdAndUpdate(
+      id,
+      { isRead: true },
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({
+        error: "Notification not found",
+      });
+    }
+
+    res.status(200).json({
+      message: "Notification marked as read",
     });
+
+  } catch (err) {
+    console.error("Error updating notification:", err);
+    res.status(500).json({ error: "Database error" });
+  }
 };
 
+
 // Delete notification
-exports.deleteNotification = (req, res) => {
+exports.deleteNotification = async (req, res) => {
+  try {
     const { id } = req.params;
-    const sql = "DELETE FROM notifications WHERE id = ?";
-    db.query(sql, [id], (err, result) => {
-        if (err) {
-            console.error("Error deleting notification:", err);
-            return res.status(500).json({ error: "Database error" });
-        }
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: "Notification not found" });
-        }
-        res.status(200).json({ message: "Notification deleted successfully" });
+
+    const deleted = await Notification.findByIdAndDelete(id);
+
+    if (!deleted) {
+      return res.status(404).json({
+        error: "Notification not found",
+      });
+    }
+
+    res.status(200).json({
+      message: "Notification deleted successfully",
     });
+
+  } catch (err) {
+    console.error("Error deleting notification:", err);
+    res.status(500).json({ error: "Database error" });
+  }
 };
