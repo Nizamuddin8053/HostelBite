@@ -4,7 +4,7 @@ pipeline {
     environment {
         VERCEL_TOKEN = "hostelbite-vercel-token"
     }
-    //
+    
     stages {
 
         stage('Clone Repo') {
@@ -39,11 +39,10 @@ pipeline {
 
         stage('Build Frontend') {
             steps {
+                bat '''
+                set CI=false
+                npm run build
                 '''
-                 set CI=false
-                 bat 'npm run build'
-
-                ''' 
             }
         }
 
