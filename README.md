@@ -96,8 +96,8 @@ JWT_SECRET=your_secret_key
 ### 1️⃣ Clone the repository
 
 ```
-git clone https://github.com/Nizamuddin8053/hostelbite.git
-cd hostelbite
+git clone https://github.com/Nizamuddin8053/HostelBite.git
+cd HostelBite
 ```
 
 ---
