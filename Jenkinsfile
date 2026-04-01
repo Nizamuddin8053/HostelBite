@@ -50,7 +50,7 @@ pipeline {
         stage('Deploy to Vercel') {
             steps {
                 bat """
-                npx vercel --prod --token=%VERCEL_TOKEN% --confirm
+                npx vercel --prod --token=%VERCEL_TOKEN% --yes
                 """
             }
         }
