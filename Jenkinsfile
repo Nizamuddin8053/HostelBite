@@ -52,6 +52,7 @@ pipeline {
         stage('Deploy to Vercel') {
             steps {
                 bat """
+                set CI=false
                 npx vercel --prod --token=%VERCEL_TOKEN% --yes
                 """
             }

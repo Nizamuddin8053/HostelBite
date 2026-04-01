@@ -79,7 +79,7 @@ const About =()=> {
                     <div className="bg-white p-6 rounded-2xl shadow-md text-center hover:shadow-xl transition">
                         <img
                             src="https://th.bing.com/th/id/OIP.g_jsgQsCS1aK7qe7z_7g0AHaE8?w=208&h=180&c=7&r=0&o=7&cb=12&dpr=1.3&pid=1.7&rm=3"
-                            alt = "payment image"
+                            alt = "payment"
                             className="w-full h-40 object-cover rounded-lg mb-4"
                         />
                         <h4 className="text-lg font-semibold text-indigo-700 mb-2">Online Payments</h4>
