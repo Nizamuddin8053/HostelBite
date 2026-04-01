@@ -1,6 +1,8 @@
 pipeline {
     agent any
 
+    // add token in environment 
+
     environment {
         VERCEL_TOKEN = "hostelbite_vercel_token"
     }
