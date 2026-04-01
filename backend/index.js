@@ -51,6 +51,11 @@ app.use("/api/staff", staffRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/qr", qrRoutes);
 
+// to check backend 
+app.get("/", (req, res) => {
+  res.send("Backend is running 🚀");
+});
+
 
 const PORT = process.env.PORT || 5000;
 
