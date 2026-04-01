@@ -63,7 +63,7 @@ import FeedbackAttendance from "./components/staff/FeedbackAttendance";
 import SalarySection from "./components/staff/SalarySection";
 
 
-
+console.log("API:" , process.env.REACT_APP_API_URL)
 
 function App() {
 
