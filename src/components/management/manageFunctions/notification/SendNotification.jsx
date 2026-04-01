@@ -14,7 +14,7 @@ const SendNotification = () => {
 
     // Fetch all students for dropdown
     useEffect(() => {
-        axios.get("http://localhost:4000/api/students/getAll")
+        axios.get(`${process.env.REACT_APP_API_URL}/api/students/getAll`)
             .then(res => setStudents(res.data))
             .catch(err => console.error("Error fetching students:", err));
     }, []);
@@ -30,7 +30,7 @@ const SendNotification = () => {
         e.preventDefault();
 
         try {
-            const res = await axios.post("http://localhost:4000/api/notification/createNotification", formData);
+            const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/notification/createNotification`, formData);
             alert(res.data.message || "Notification sent successfully!");
             setFormData({
                 targetType: "all",

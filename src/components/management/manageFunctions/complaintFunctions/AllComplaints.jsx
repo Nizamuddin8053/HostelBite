@@ -8,7 +8,7 @@ const AllComplaints = () => {
     // Fetch all complaints
     const fetchComplaints = async () => {
         try {
-            const res = await axios.get("http://localhost:4000/api/complaints/");
+            const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/complaints/`);
             setComplaints(res.data);
         } catch (error) {
             console.error("Error fetching complaints:", error);
@@ -21,7 +21,7 @@ const AllComplaints = () => {
     const handleResolve = async (complaint_id) => {
         if (!window.confirm("Are you sure you want to mark this complaint as resolved?")) return;
         try {
-            await axios.put(`http://localhost:4000/api/complaints/${complaint_id}/resolve`,{
+            await axios.put(`${process.env.REACT_APP_API_URL}/api/complaints/${complaint_id}/resolve`,{
                 complaint_id: complaint_id,
                 response: "Your complaint has been resolved."
             });

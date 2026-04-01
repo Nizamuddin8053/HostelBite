@@ -28,7 +28,7 @@ const LoginForm = () => {
 
         try {
             const response = await axios.post(
-                "localhost:4000/api/auth/login",
+                `${process.env.REACT_APP_API_URL}/api/auth/login`,
                 {
                     email: formData.email,
                     password: formData.password,

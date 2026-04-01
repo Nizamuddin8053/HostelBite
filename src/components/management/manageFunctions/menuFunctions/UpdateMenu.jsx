@@ -16,7 +16,7 @@ const UpdateMenu = () => {
         }
 
         try {
-            const res = await axios.put("http://localhost:4000/api/menu/updateMenu", {
+            const res = await axios.put(`${process.env.REACT_APP_API_URL}/api/menu/updateMenu`, {
                 day,
                 meal_type: mealType,
                 items,
@@ -29,9 +29,9 @@ const UpdateMenu = () => {
         } catch (error) {
             console.error("Error updating menu:", error);
             if (error.response && error.response.status === 404) {
-                setMessage("❌ Menu not found for the specified day.");
+                setMessage("Menu not found for the specified day.");
             } else {
-                setMessage("❌ Error updating menu. Please try again.");
+                setMessage("Error updating menu. Please try again.");
             }
         }
     };

@@ -21,7 +21,7 @@ const MessPayment = () => {
            
             try {
                 // Fetch student details using token
-                const res = await axios.get(`http://localhost:4000/api/students/${id}`, {
+                const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/students/${id}`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -61,7 +61,7 @@ const MessPayment = () => {
 
         try {
             //  Create order on backend
-            const orderRes = await axios.post("http://localhost:4000/api/payments/create-order", {
+            const orderRes = await axios.post(`${process.env.REACT_APP_API_URL}/api/payments/create-order`, {
                 amount,
                 name: student.name,
                 email: student.email,
@@ -83,7 +83,7 @@ const MessPayment = () => {
                 handler: async function (response) {
                     try {
                         // Verify payment on backend
-                        await axios.post("http://localhost:4000/api/payments/verify-payment", {
+                        await axios.post(`${process.env.REACT_APP_API_URL}/api/payments/verify-payment`, {
                             ...response,
                             email: student.email,
                             name: student.name,

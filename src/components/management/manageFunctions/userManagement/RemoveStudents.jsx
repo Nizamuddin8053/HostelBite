@@ -10,7 +10,7 @@ const RemoveStudents = () => {
     // Fetch all students
     const fetchStudents = async () => {
         try {
-            const res = await axios.get("http://localhost:4000/api/students/getAll");
+            const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/students/getAll`);
             setStudents(res.data);
         } catch (err) {
             console.error("Error fetching students:", err);
@@ -27,7 +27,7 @@ const RemoveStudents = () => {
         
         try {
             
-            await axios.delete(`http://localhost:4000/api/students/${student_id}`);
+            await axios.delete(`${process.env.REACT_APP_API_URL}/api/students/${student_id}`);
             alert("Student deleted successfully!");
             fetchStudents();
         } catch (err) {
@@ -42,7 +42,7 @@ const RemoveStudents = () => {
         if (!window.confirm(`Remove all students from ${course} - Year ${year}?`)) return;
 
         try {
-            await axios.delete("http://localhost:4000/api/students/deleteCourseYear", {
+            await axios.delete(`${process.env.REACT_APP_API_URL}/api/students/deleteCourseYear`, {
                 data: {
                     course,
                     year

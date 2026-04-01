@@ -19,7 +19,7 @@ const ViewMenu = () => {
     useEffect(() => {
         const fetchMenu = async () => {
             try {
-                const response = await axios.get("http://localhost:4000/api/menu/getAll");
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/menu/getAll`);
                 setMenuData(response.data);
             } catch (err) {
                 setError("Error fetching menu. Please try again later.");

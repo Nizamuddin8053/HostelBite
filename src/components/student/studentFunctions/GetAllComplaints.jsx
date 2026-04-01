@@ -19,7 +19,7 @@ const ViewComplaints = () => {
             const student_id = decoded.id;
 
             // Send request with token in Authorization header
-            const res = await axios.get(`http://localhost:4000/api/complaints/complaint/${student_id}`, {
+            const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/complaints/complaint/${student_id}`, {
                student_id,
             })
 

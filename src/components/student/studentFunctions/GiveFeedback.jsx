@@ -21,7 +21,7 @@ const GiveFeedback = () => {
         }
 
         try {
-            const res = await axios.post("http://localhost:4000/api/feedbacks/", {
+            const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/feedbacks/`, {
                 student_id: studentId,
                 message,
                 rating,

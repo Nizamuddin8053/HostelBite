@@ -29,7 +29,7 @@ const ScanQR = () => {
                 };
 
                 const res = await axios.post(
-                    "http://localhost:4000/api/attendance/mark",
+                    `${process.env.REACT_APP_API_URL}/api/attendance/mark`,
                     payload
                 );
 

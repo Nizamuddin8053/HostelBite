@@ -9,7 +9,7 @@ const QRDisplay = ({ onBack }) => {
 
     const fetchQR = async () => {
         try {
-            const res = await axios.get("http://localhost:4000/api/qr/get-qr");
+            const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/qr/get-qr`);
             setQrCode(res.data.qrUrl);
             setTimer(30); // reset countdown
         } catch (err) {

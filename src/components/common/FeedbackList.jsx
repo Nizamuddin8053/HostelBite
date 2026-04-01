@@ -9,7 +9,7 @@ const FeedbackList = () => {
     useEffect(() => {
         const fetchFeedbacks = async () => {
             try {
-                const res = await axios.get("http://localhost:4000/api/feedbacks/getAll");
+                const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/feedbacks/getAll`);
                 setFeedbacks(res.data);
             } catch (err) {
                 console.error(err);

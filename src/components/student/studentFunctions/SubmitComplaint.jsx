@@ -24,7 +24,7 @@ const SubmitComplaint = () => {
         setMessage("");
 
         try {
-            const res = await axios.post("http://localhost:4000/api/complaints/complaint", {
+            const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/complaints/complaint`, {
                 student_id,
                 title,
                 description,

@@ -10,7 +10,7 @@ const DeleteMenu = () => {
         }
 
         try {
-            const res = await axios.delete("http://localhost:4000/api/menu/delete");
+            const res = await axios.delete(`${process.env.REACT_APP_API_URL}/api/menu/delete`);
             setMessage(`✅ ${res.data.message}`);
         } catch (error) {
             console.error("Error deleting menu:", error);

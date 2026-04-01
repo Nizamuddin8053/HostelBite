@@ -61,7 +61,7 @@ const AddExpense = () => {
             // }
 
             // Proceed to add new expense
-            const response = await axios.post("http://localhost:4000/api/expenses/", {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/expenses/`, {
                 ...formData,
                 amount,
                 management_id: management_id, 
