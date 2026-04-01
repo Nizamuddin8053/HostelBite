@@ -53,6 +53,7 @@ pipeline {
         stage('Deploy to Vercel') {
             steps {
                 bat """
+                set CI=false
                 npx vercel --prod --token=%VERCEL_TOKEN% --yes
                 """
             }
@@ -62,6 +63,7 @@ pipeline {
         stage('Trigger Render Deploy') {
             steps {
                 bat """
+                set CI=false
                 curl -X POST https://api.render.com/deploy/srv-d74i2os50q8c73e0h870?key=RqU-0nb0AyM
                 """
             }
