@@ -1,4 +1,4 @@
-import React from "react";
+
 import { FileSpreadsheet } from "lucide-react";
 
 const ManageStaffSalary = ({ role }) => {

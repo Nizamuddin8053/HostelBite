@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import axios from "axios";
 
 const ViewExpenses = () => {
@@ -7,7 +7,7 @@ const ViewExpenses = () => {
     const [categoryBreakdown, setCategoryBreakdown] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const totalBudget = 50000; // Example budget (you can make it dynamic later)
+    const totalBudget = 50000; // Example budget 
 
     useEffect(() => {
         const fetchData = async () => {

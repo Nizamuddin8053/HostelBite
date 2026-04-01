@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 
@@ -15,7 +15,7 @@ const MarkAttendance = () => {
             return;
         }
 
-        // 👇 Call backend to verify and mark attendance
+        // Call backend to verify and mark attendance
         axios
             .get(`http://localhost:4000/api/attendance/verify?token=${token}`)
             .then((res) => {

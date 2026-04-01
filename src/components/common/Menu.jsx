@@ -1,5 +1,5 @@
-import React from "react";
-import { UtensilsCrossed, DollarSign } from "lucide-react";
+
+import { UtensilsCrossed } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const Menu = () => {

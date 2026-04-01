@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -76,7 +76,7 @@ const SignupForm = () => {
             alert(error.response?.data?.message || "Signup failed!");
         }
 
-        // console.log("Form Submitted:", formData);
+        
     };
 
     const { role } = formData;

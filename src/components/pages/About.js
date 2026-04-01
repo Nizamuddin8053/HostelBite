@@ -1,5 +1,5 @@
-import React from "react";
-import { Utensils, Users, Heart, Lightbulb, Star, Mail } from "lucide-react";
+
+import { Heart, Lightbulb, Star, Mail } from "lucide-react";
 import nizam from '../../assets/nizam.jpg';
 import abhijeet from '../../assets/Abhijeet.jpg';
 import amarjeet from "../../assets/amarjeet.jpeg";

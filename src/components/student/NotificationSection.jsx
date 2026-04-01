@@ -1,5 +1,5 @@
-import React from "react";
-import { Bell, Send } from "lucide-react";
+
+import { Bell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const NotificationSection =()=> {

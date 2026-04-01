@@ -1,4 +1,4 @@
-import React from "react";
+
 import { Link, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
@@ -6,7 +6,7 @@ const Navbar = () => {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
 
-    // const name = localStorage.getItem("name");
+   
 
 
     const handleLogout = () => {
@@ -38,10 +38,7 @@ const Navbar = () => {
                 ) : (
                     <>
 
-                         {/* <span className="font-semibold">
-                            Welcome, {name}
-                        </span>
-                         */}
+                        
                         <button
                             onClick={() => {
                                 if (role === "student") navigate("/student-dashboard");

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
@@ -56,7 +56,7 @@ const AddExpense = () => {
             //     category,
             // });
             // if (checkRes.data.exists) {
-            //     setMessage("❌ This expense already exists!");
+            //     setMessage(" This expense already exists!");
             //     return;
             // }
 

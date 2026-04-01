@@ -1,5 +1,5 @@
-import React from "react";
-import { CreditCard, FileText, Clock } from "lucide-react";
+
+import { CreditCard } from "lucide-react";
 
 const ManagePaymentInvoice = () => {
     return (

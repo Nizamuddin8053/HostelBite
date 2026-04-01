@@ -1,6 +1,6 @@
 import React from "react";
 import {Routes, Route, Navigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
+
 import Navbar from "./components/common/Navbar";
 import Home from "./components/pages/Home";
 import About from "./components/pages/About";

@@ -1,5 +1,5 @@
-import React from "react";
-import Sidebar from "../common/Sidebar";
+// import React from "react";
+// import Sidebar from "../common/Sidebar";
 import SalarySection from "../staff/SalarySection";
 import NotificationSection from "../staff/ComplaintNotification";
 import MenuSection from "../common/Menu";

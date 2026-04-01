@@ -1,5 +1,5 @@
-import React from "react";
-import { Utensils, Leaf, Drumstick, CreditCard, Bell, ClipboardList } from "lucide-react";
+
+import {  Leaf, Drumstick, CreditCard, Bell, ClipboardList } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const Home = () => {

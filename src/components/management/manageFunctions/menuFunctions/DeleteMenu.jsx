@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 
 const DeleteMenu = () => {
     const [message, setMessage] = useState("");
 
     const handleDelete = async () => {
-        if (!window.confirm("⚠️ Are you sure you want to delete the entire menu?")) {
+        if (!window.confirm("Are you sure you want to delete the entire menu?")) {
             return;
         }
 
@@ -15,9 +15,9 @@ const DeleteMenu = () => {
         } catch (error) {
             console.error("Error deleting menu:", error);
             if (error.response && error.response.status === 404) {
-                setMessage("❌ Menu not found.");
+                setMessage(" Menu not found.");
             } else {
-                setMessage("❌ Error deleting menu. Please try again.");
+                setMessage(" Error deleting menu. Please try again.");
             }
         }
     };

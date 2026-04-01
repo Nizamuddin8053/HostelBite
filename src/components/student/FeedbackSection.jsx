@@ -1,6 +1,6 @@
-import React from "react";
-import { Star, ClipboardList } from "lucide-react";
-import axios from "axios";
+
+import { Star } from "lucide-react";
+
 import {useNavigate} from "react-router-dom";
 
 const FeedbackSection = () => {

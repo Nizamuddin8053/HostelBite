@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import axios from "axios";
 
 const CreateMenu = () => {
@@ -26,7 +26,7 @@ const CreateMenu = () => {
         // Validate all fields
         const emptyFields = menuItems.some((m) => !m.items.trim());
         if (emptyFields) {
-            setMessage("❌ Please fill all 7 days before submitting.");
+            setMessage("Please fill all 7 days before submitting.");
             return;
         }
 

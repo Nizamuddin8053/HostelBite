@@ -1,5 +1,5 @@
-import React from "react";
-import { CreditCard, FileText, Clock } from "lucide-react";
+
+import { CreditCard, Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const PaymentSection =()=> {

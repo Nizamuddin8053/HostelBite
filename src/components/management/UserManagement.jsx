@@ -1,6 +1,6 @@
-import React from "react";
-import { User, ClipboardList } from "lucide-react";
-import axios from "axios";
+
+import { User} from "lucide-react";
+
 import { useNavigate } from "react-router-dom";
 
 const UserManagement = () => {
