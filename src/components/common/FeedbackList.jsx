@@ -12,7 +12,7 @@ const FeedbackList = () => {
                 fetch(`${process.env.REACT_APP_API_URL}/api/feedbacks/getAll`)
                             .then(res => res.json())
                             .then(console.log)
-                // const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/feedbacks/getAll`);
+                const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/feedbacks/getAll`);
                 setFeedbacks(res.data);
             } catch (err) {
                 console.error(err);
