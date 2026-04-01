@@ -5,7 +5,7 @@ pipeline {
  
 
     environment {
-        VERCEL_TOKEN = "hostelbite_vercel_token"
+        VERCEL_TOKEN = credentials("hostelbite_vercel_token")
     }
     
     stages {
