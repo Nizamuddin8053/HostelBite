@@ -31,7 +31,7 @@ require("dotenv").config();
 const app = express();
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://hostelbite-project.vercel.app"],
+    origin: [ "https://hostelbite-project.vercel.app"],
     credentials: true
   })
 );
