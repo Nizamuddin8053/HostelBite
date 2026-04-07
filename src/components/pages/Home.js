@@ -1,32 +1,32 @@
 
-import { 
-  CreditCard, 
-  Bell, 
-  ClipboardList, 
-  Users, 
-  MessageSquare, 
-  AlertCircle ,
-  Leaf,
-  Drumstick
+import {
+    CreditCard,
+    Bell,
+    ClipboardList,
+    Users,
+    MessageSquare,
+    AlertCircle,
+    Leaf,
+    Drumstick
 } from "lucide-react";
-
-
 import { useNavigate } from "react-router-dom";
-import { Swiper, SwiperSlide } from "swiper/react";
-import "swiper/css";
-import "swiper/css/autoplay";
-import { Autoplay } from "swiper/modules";
-
 import AOS from "aos";
 import "aos/dist/aos.css";
-import { useEffect } from "react";
+
+import { useState, useEffect } from "react";
+
+const images = [
+        "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg",
+        "https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg",
+        "https://images.pexels.com/photos/70497/pexels-photo-70497.jpeg",
+    ];
 
 
 const Home = () => {
 
 
     const navigate = useNavigate();
-
+    const [current, setCurrent] = useState(0);
 
 
 
@@ -34,17 +34,21 @@ const Home = () => {
         AOS.init({ duration: 1000 });
     }, []);
 
-
     const LearnMoreHandler = () => {
         navigate("/about");
     }
-
     const GetStartedHandler = () => {
         navigate("/signup");
     }
 
 
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrent((prev) => (prev + 1) % images.length);
+        }, 4000); // change every 4 sec
 
+        return () => clearInterval(interval);
+    }, []);
 
 
     return (
@@ -97,37 +101,53 @@ const Home = () => {
             </section>
 
             {/*  Hero Section */}
+
             <section className="py-10 px-6 bg-gradient-to-b from-indigo-50 to-white">
-                <Swiper
-                    modules={[Autoplay]}
-                    autoplay={{ delay: 5000 }}
-                    loop={true}
-                    className="rounded-2xl overflow-hidden max-w-6xl mx-auto"
-                >
-                    <SwiperSlide>
-                        <img
-                            src="https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg"
-                            alt="FoodSlider1"
-                            className="w-full h-[400px] object-cover"
-                        />
-                    </SwiperSlide>
+                <div className="relative max-w-6xl mx-auto rounded-2xl overflow-hidden">
 
-                    <SwiperSlide>
-                        <img
-                            src="https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg"
-                            alt="FoodSlider2"
-                            className="w-full h-[400px] object-cover"
-                        />
-                    </SwiperSlide>
+                    {/* Image */}
+                    <img
+                        src={images[current]}
+                        alt="slider"
+                        className="w-full h-[400px] object-cover transition-all duration-700"
+                    />
 
-                    <SwiperSlide>
-                        <img
-                            src="https://images.pexels.com/photos/70497/pexels-photo-70497.jpeg"
-                            alt="FoodSlider3"
-                            className="w-full h-[400px] object-cover"
-                        />
-                    </SwiperSlide>
-                </Swiper>
+                    {/* Overlay Text (optional - looks premium) */}
+                    <div className="absolute inset-0 bg-black bg-opacity-30 flex flex-col justify-center items-center text-white text-center">
+                        <h2 className="text-3xl md:text-4xl font-bold mb-2">
+                            Delicious Meals Everyday 🍽️
+                        </h2>
+                        <p className="text-lg">Fresh • Hygienic • Affordable</p>
+                    </div>
+
+                    {/* Dots */}
+                    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+                        {images.map((_, index) => (
+                            <div
+                                key={index}
+                                className={`w-3 h-3 rounded-full ${current === index ? "bg-white" : "bg-gray-400"
+                                    }`}
+                            ></div>
+                        ))}
+                    </div>
+
+
+                    <button
+                        onClick={() => setCurrent((current - 1 + images.length) % images.length)}
+                        className="absolute left-4 top-1/2 text-white text-2xl"
+                    >
+                        ⏮
+                    </button>
+
+                    <button
+                        onClick={() => setCurrent((current + 1) % images.length)}
+                        className="absolute right-4 top-1/2 text-white text-2xl"
+                    >
+                        ⏭
+                        
+                    </button>
+
+                </div>
             </section>
 
             {/* repeated section */}
