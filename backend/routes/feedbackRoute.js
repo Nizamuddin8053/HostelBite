@@ -4,23 +4,20 @@ const {
     createFeedback,
     getAllFeedback,
     getFeedbackByStudent,
-    deleteFeedback
 } = require("../controllers/Student/feedbackController");
-
-const {auth,isStudent, isAdmin}  = require("../middlewares/auth");
 
 const router = express.Router();
 
 // Add new feedback
-router.post("/",  auth, isStudent, createFeedback);
+router.post("/", createFeedback);
 
 // Get all feedback
-router.get("/getAll",  auth,isAdmin,getAllFeedback);
+router.get("/getAll", getAllFeedback);
 
 // Get feedback by student
-router.get("/student/:studentId", getFeedbackByStudent);
+router.get("/student/:student_id", getFeedbackByStudent);
 
 // Delete feedback
-router.delete("/:id",  deleteFeedback);
+// router.delete("/:id",  deleteFeedback);
 
 module.exports = router;

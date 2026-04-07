@@ -21,4 +21,6 @@ const invoiceSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
+invoiceSchema.index({ student_id: 1, due_date: 1 });
+
 module.exports = mongoose.model("Invoice", invoiceSchema);

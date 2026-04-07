@@ -9,19 +9,19 @@ const {
     deleteComplaint
 } = require("../controllers/Student/complaintController");
 
-const {auth,isStudent, isAdmin}  = require("../middlewares/auth");
+
 
 // Create a new complaint
-router.post("/complaint", auth, isStudent, createComplaint);
+router.post("/complaint", createComplaint);
 
 // Get all complaints
-router.get("/", auth, isAdmin ,getAllComplaints);
+router.get("/", getAllComplaints);
 
 // Get a complaint by ID
 router.get("/complaint/:id",  getComplaintById);
 
 // Update complaint status
-router.put("/:id/resolve", auth, updateComplaintStatus);
+router.put("/:id/resolve", updateComplaintStatus);
 
 // Delete a complaint
 router.delete("/complaint/:id",  deleteComplaint);

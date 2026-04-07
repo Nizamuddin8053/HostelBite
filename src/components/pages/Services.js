@@ -13,7 +13,7 @@ export default function Services() {
     return (
         <div className="min-h-screen bg-gray-50 font-sans text-gray-800 flex flex-col">
             
-            {/* 🏠 Hero Section */}
+            {/* Hero Section */}
             <section className="text-center py-20 px-6 bg-gradient-to-b from-indigo-50 to-white">
                 <h2 className="text-4xl md:text-5xl font-extrabold text-indigo-700 mb-6">
                     Our Services at HostelBite 🍴
@@ -25,7 +25,7 @@ export default function Services() {
                 </p>
             </section>
 
-            {/* 💡 Services Grid */}
+            {/*  Services Grid */}
             <section className="py-16 px-8 bg-white">
                 <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
                     {/* Menu Management */}
@@ -140,7 +140,7 @@ export default function Services() {
                 </div>
             </section>
 
-            {/* 🍴 CTA Section */}
+            {/*  CTA Section */}
             <section className="py-20 bg-indigo-600 text-white text-center">
                 <h3 className="text-3xl font-semibold mb-4">
                     Streamline Your Hostel’s Mess Management Today!
@@ -157,12 +157,7 @@ export default function Services() {
                 </a>
             </section>
 
-            {/* ⚓ Footer */}
-            <footer className="bg-indigo-700 text-white text-center py-4 mt-10">
-                <p className="text-sm">
-                    © {new Date().getFullYear()} HostelBite | Made with ❤️ for hostel life
-                </p>
-            </footer>
+            
         </div>
     );
 }

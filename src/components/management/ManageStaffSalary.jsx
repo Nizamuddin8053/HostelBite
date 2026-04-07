@@ -1,8 +1,24 @@
 
 import { FileSpreadsheet } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const ManageStaffSalary = ({ role }) => {
     const isAdmin = localStorage.getItem("role") === "admin";
+    const navigate = useNavigate();
+
+    const addStaffHandler = ()=>{
+        navigate("/approve-staff");
+    }
+
+    const getAllStaffHandler = ()=>{
+        navigate("/get-all-staff");
+    }
+
+    const updateStaffSalaryHandler = ()=>{
+        navigate("/update-staff-salary");
+    }
+
+
 
     return (
         <div className="bg-white p-5 rounded-2xl shadow-md">
@@ -19,17 +35,17 @@ const ManageStaffSalary = ({ role }) => {
 
             <div className="flex gap-3 flex-wrap">
 
-                <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
-                    Add Staff
+                <button onClick={addStaffHandler} className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                    Add staff
                 </button>
-                <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
-                    Update Staff Info
+                <button onClick={getAllStaffHandler} className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
+                    Get all staff
                 </button>
                 <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
                     Generate Salary Slip
                 </button>
-                <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
-                    View Salary
+                <button onClick={updateStaffSalaryHandler} className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                    update staff salary 
                 </button>
                 
             </div>

@@ -3,18 +3,18 @@ const Expense = require("../../models/Expense");
 
 exports.createExpense = async (req, res) => {
   try {
-    const { title, category, date, description, qty, rateKg, managementId } = req.body;
+    const { item, category, date, description, qty, rateKg, managementId , amount} = req.body;
 
-    if (!title || !qty || !rateKg || !category || !date) {
+    if (!item || !qty || !rateKg || !category || !date || !amount) {
       return res.status(400).json({
-        error: "Title, quantity, rateKg, category, and date are required"
+        error: "item, quantity, rateKg, category, and date are required"
       });
     }
 
-    const amount = qty * rateKg;
+    
 
     const newExpense = await Expense.create({
-      title,
+      item,
       category,
       date,
       description,
@@ -81,71 +81,91 @@ exports.getAllExpenses = async (req, res) => {
 };
 
 
-exports.getExpenseById = async (req, res) => {
+exports.getMonthlyCategoryExpenses = async (req, res) => {
   try {
-    const expense = await Expense.findById(req.params.id);
+    const { year } = req.query;
 
-    if (!expense) {
-      return res.status(404).json({ error: "Expense not found" });
+    let matchStage = {};
+
+    if (year) {
+      matchStage = {
+        date: {
+          $gte: new Date(`${year}-01-01`),
+          $lte: new Date(`${year}-12-31`)
+        }
+      };
     }
 
-    res.status(200).json(expense);
+    const data = await Expense.aggregate([
+      { $match: matchStage },
 
-  } catch (error) {
-    console.error("Error fetching expense:", error);
-    res.status(500).json({ error: "Server error" });
-  }
-};
+      // Step 1: Group by month + category
+      {
+        $group: {
+          _id: {
+            month: { $month: "$date" },
+            category: "$category"
+          },
+          totalSpent: { $sum: "$amount" }
+        }
+      },
+
+      // Step 2: Group again by month
+      {
+        $group: {
+          _id: "$_id.month",
+          categories: {
+            $push: {
+              category: "$_id.category",
+              totalSpent: "$totalSpent"
+            }
+          },
+          monthlyTotal: { $sum: "$totalSpent" }
+        }
+      },
+
+      // Step 3: Add month name
+      {
+        $addFields: {
+          month: {
+            $arrayElemAt: [
+              [
+                "", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+              ],
+              "$_id"
+            ]
+          }
+        }
+      },
+
+      // Step 4: Clean response
+      {
+        $project: {
+          _id: 0,
+          month: 1,
+          monthlyTotal: 1,
+          categories: 1
+        }
+      },
+
+      { $sort: { _id: 1 } }
+    ]);
 
 
-exports.updateExpense = async (req, res) => {
-  try {
-    const { title, category, date, description, qty, rateKg } = req.body;
-
-    let updateData = { title, category, date, description };
-
-    // If qty or rateKg updated → recalculate amount
-    if (qty && rateKg) {
-      updateData.qty = qty;
-      updateData.rateKg = rateKg;
-      updateData.amount = qty * rateKg;
-    }
-
-    const updated = await Expense.findByIdAndUpdate(
-      req.params.id,
-      updateData,
-      { new: true }
-    );
-
-    if (!updated) {
-      return res.status(404).json({ error: "Expense not found" });
-    }
+    console.log(data);
 
     res.status(200).json({
-      message: "Expense updated successfully",
-      data: updated
+      success: true,
+      data: data,
     });
 
   } catch (error) {
-    console.error("Error updating expense:", error);
-    res.status(500).json({ error: "Server error" });
-  }
-};
-
-
-exports.deleteExpense = async (req, res) => {
-  try {
-    const deleted = await Expense.findByIdAndDelete(req.params.id);
-
-    if (!deleted) {
-      return res.status(404).json({ error: "Expense not found" });
-    }
-
-    res.status(200).json({ message: "Expense deleted successfully" });
-
-  } catch (error) {
-    console.error("Error deleting expense:", error);
-    res.status(500).json({ error: "Server error" });
+    console.error("Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server Error"
+    });
   }
 };
 

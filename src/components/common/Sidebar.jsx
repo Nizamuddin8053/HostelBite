@@ -29,7 +29,7 @@ const Sidebar = ({ role }) => {
 
     const adminLinks = [
         { label: "Feedback & Attendance", icon: Book, path: "/admin-dashboard/feedback-section" },
-        { label: "Menu & Expenses", icon: Utensils, path: "/admin-dashboard/menu-section" },
+        { label: "Menu & Expenses", icon: Utensils, path: "/admin-dashboard/menu-expense-section" },
         { label: "Payments & Invoices", icon: CreditCard, path: "/admin-dashboard/payments-section" },
         { label: "Staff Salary", icon: FileSpreadsheet, path: "/admin-dashboard/salary-section" },
         { label: "Manage Complaints & Notifications", icon: FileText, path: "/admin-dashboard/complaints-section" },

@@ -18,7 +18,8 @@ const notificationRoutes = require("./routes/notificationRoute");
 const salaryRoutes = require("./routes/salaryRoute");
 const staffRoutes = require("./routes/staffRoute");
 const paymentRoutes = require("./routes/paymentRoutes");
-const qrRoutes = require("./routes/qrRoutes");
+// const qrRoutes = require("./routes/qrRoutes");
+
 
 
 
@@ -30,7 +31,7 @@ require("dotenv").config();
 const app = express();
 app.use(
   cors({
-    origin: ["https://hostelbite-project.vercel.app"],
+    origin: ["http://localhost:3000", "https://hostelbite-project.vercel.app"],
     credentials: true
   })
 );
@@ -42,14 +43,15 @@ app.use("/api/attendance", attendanceRoutes);
 app.use("/api/complaints", complaintRoutes);
 app.use("/api/expenses", expenseRoutes);
 app.use("/api/feedbacks", feedbackRoutes);
-app.use("/api/invoices", invoiceRoutes);
+app.use("/api/invoice", invoiceRoutes);
 app.use("/api/management", managementRoutes);
 app.use("/api/menu", menuRoutes);
 app.use("/api/notification", notificationRoutes);
 app.use("/api/salary", salaryRoutes);
 app.use("/api/staff", staffRoutes);
 app.use("/api/payments", paymentRoutes);
-app.use("/api/qr", qrRoutes);
+// app.use("/api/qr", qrRoutes);
+
 
 // to check backend 
 app.get("/", (req, res) => {

@@ -1,19 +1,44 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import Spinner from "../common/Spinner";
+import { EyeOff, Eye } from "lucide-react";
+import showToast from "../../utils/showToast";
+import { TOAST_TYPE } from "../../utils/constants";
+
+
 // login form 
 const LoginForm = () => {
 
-    localStorage.clear();
+    // localStorage.clear();
     const navigate = useNavigate();
-    
+
+    const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+
+
     const [formData, setFormData] = useState({
         email: "",
         password: "",
         role: "",
     });
 
- 
+
+    // check staff is approved or not
+    const checkApprove = async () => {
+        try {
+            const res = await axios.post(
+                `${process.env.REACT_APP_API_URL}/api/staff/checkapprove`,
+                { email: formData.email }
+            );
+
+            return res.data.message; // true or false
+        } catch (error) {
+            return false;
+        }
+    };
+
+
 
     const handleChange = (e) => {
         setFormData({
@@ -22,11 +47,34 @@ const LoginForm = () => {
         });
     };
 
+    const updatePasswordHandler = () => {
+        navigate("/update-password");
+
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        setLoading(true);
 
         try {
+
+
+
+            if (formData.role === "staff") {
+                const isApproved = await checkApprove();
+
+                if (!isApproved) {
+
+                    showToast("Admin will approve you soon!", TOAST_TYPE.INFO);
+                    
+                    setLoading(false);
+                    return; // ⛔ STOP LOGIN
+                }
+            }
+
+
+
             const response = await axios.post(
                 `${process.env.REACT_APP_API_URL}/api/auth/login`,
                 {
@@ -42,21 +90,12 @@ const LoginForm = () => {
             );
 
 
-            
 
-
-            // when we are log in add token and role to localstorage
-
-
-            // console.log(" Login response:", response.data);
             localStorage.setItem("token", response.data.token);
-            localStorage.setItem("role", response.data.role);
 
-            
+            showToast("login successfull!", TOAST_TYPE.SUCCESS);
 
-            alert("Login successful!");
-            
-
+        
             // navigate to respective dashboard based on role
             if (response.data.role === "student") {
                 navigate("/student-dashboard");
@@ -68,75 +107,103 @@ const LoginForm = () => {
                 navigate("/");
             }
 
-
         } catch (error) {
+
             console.error(" Login error:", error.response?.data || error.message);
-            alert(error.response?.data?.message || "Login failed!");
+
+            showToast(error.response?.data?.message || "login failed!", TOAST_TYPE.ERROR);
+            
+
+        } finally {
+            setLoading(false);
+
         }
     };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
-            <form
-                onSubmit={handleSubmit}
-                className="bg-white shadow-xl rounded-2xl p-8 w-full max-w-md space-y-5"
-            >
-                <h2 className="text-2xl font-semibold text-center text-gray-800">
-                    Login
-                </h2>
-
-                {/* Email */}
-                <div>
-                    <label className="block mb-1 text-gray-600 font-medium">Email</label>
-                    <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        placeholder="Enter your email"
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                    />
-                </div>
-
-                {/* Password */}
-                <div>
-                    <label className="block mb-1 text-gray-600 font-medium">
-                        Password
-                    </label>
-                    <input
-                        type="password"
-                        name="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        placeholder="Enter password"
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                    />
-                </div>
-
-                {/* Role Dropdown */}
-                <div>
-                    <label className="block mb-1 text-gray-600 font-medium">Role</label>
-                    <select
-                        name="role"
-                        value={formData.role}
-                        onChange={handleChange}
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            {
+                loading ? <Spinner /> :
+                    <form
+                        onSubmit={handleSubmit}
+                        className="bg-white shadow-xl rounded-2xl p-8 w-full max-w-md space-y-5"
                     >
-                        <option value="">Select role</option>
-                        <option value="student">Student</option>
-                        <option value="staff">Staff</option>
-                        <option value="admin">Admin</option>
-                    </select>
-                </div>
+                        <h2 className="text-2xl font-semibold text-center text-gray-800">
+                            Login
+                        </h2>
 
-                {/* Submit Button */}
-                <button
-                    type="submit"
-                    className="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition duration-300"
-                >
-                    Login
-                </button>
-            </form>
+                        {/* Email */}
+                        <div>
+                            <label className="block mb-1 text-gray-600 font-medium">Email</label>
+                            <input
+                                type="email"
+                                name="email"
+                                value={formData.email.toLowerCase().trim()}
+                                onChange={handleChange}
+                                placeholder="Enter your email"
+                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            />
+                        </div>
+
+                        {/* Password */}
+                        <div className="flex flex-col relative">
+                            <label className="block mb-1 text-gray-600 font-medium">
+                                Password
+                            </label>
+                            {
+                                showPassword ? <div>
+                                    <Eye onClick={() => { setShowPassword(false) }} className="absolute right-2 top-9 hover:cursor-pointer w-5" />
+                                    <input
+                                        type="text"
+                                        name="password"
+                                        value={formData.password}
+                                        onChange={handleChange}
+                                        placeholder="Enter password"
+                                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                    />
+                                </div> :
+                                    <div>
+                                        <EyeOff onClick={() => { setShowPassword(true) }} className="absolute right-2 top-9 hover:cursor-pointer w-5" />
+                                        <input
+                                            type="password"
+                                            name="password"
+                                            value={formData.password}
+                                            onChange={handleChange}
+                                            placeholder="Enter password"
+                                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                        />
+
+
+                                    </div>
+                            }
+                            <div onClick={updatePasswordHandler} className="text-blue-700 hover:cursor-pointer text-sm self-end">forgot password ? </div>
+                        </div>
+
+                        {/* Role Dropdown */}
+                        <div>
+                            <label className="block mb-1 text-gray-600 font-medium">Role</label>
+                            <select
+                                name="role"
+                                value={formData.role}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            >
+                                <option value="">Select role</option>
+                                <option value="student">Student</option>
+                                <option value="staff">Staff</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+
+                        {/* Submit Button */}
+                        <button
+                            type="submit"
+                            className="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition duration-300"
+                        >
+                            Login
+                        </button>
+                    </form>
+            }
         </div>
     );
 };

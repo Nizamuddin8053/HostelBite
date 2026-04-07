@@ -1,78 +1,94 @@
-import  { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 
+const days = [
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+  "sunday",
+];
+
+const meals = ["breakfast", "lunch", "snacks", "dinner"];
+
 const ViewMenu = () => {
-    const [menuData, setMenuData] = useState([]);
-    const [error, setError] = useState("");
+  const [menu, setMenu] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-    const days = [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Sunday",
-    ];
-    const mealTypes = ["breakfast", "lunch", "snacks", "dinner"];
+  const fetchMenu = async () => {
+    try {
+      const res = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/menu/latest-menu`
+      );
+      setMenu(res.data);
+    } catch (err) {
+      console.error("Error fetching menu:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    useEffect(() => {
-        const fetchMenu = async () => {
-            try {
-                const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/menu/getAll`);
-                setMenuData(response.data);
-            } catch (err) {
-                setError("Error fetching menu. Please try again later.");
-            }
-        };
-        fetchMenu();
-    }, []);
+  useEffect(() => {
+    fetchMenu();
+  }, []);
 
-    // Organize data day-wise
-    const structuredMenu = days.map((day) => {
-        const dayMeals = menuData.filter((m) => m.day === day);
-        const menuRow = { day };
-        mealTypes.forEach((meal) => {
-            const mealData = dayMeals.find((m) => m.meal_type === meal);
-            menuRow[meal] = mealData ? mealData.items : "-";
-        });
-        return menuRow;
-    });
-
+  if (loading)
     return (
-        <div className="max-w-6xl mx-auto mt-8 p-4">
-            <h2 className="text-2xl font-bold text-center mb-4">Weekly Mess Menu</h2>
-
-            {error && <p className="text-red-600 text-center mb-4">{error}</p>}
-
-            <div className="overflow-x-auto shadow-lg rounded-lg">
-                <table className="min-w-full border-collapse border border-gray-300">
-                    <thead>
-                        <tr className="bg-green-500 text-white">
-                            <th className="border border-gray-300 px-4 py-2 text-left">Day</th>
-                            {mealTypes.map((meal) => (
-                                <th key={meal} className="border border-gray-300 px-4 py-2 capitalize text-left">
-                                    {meal}
-                                </th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {structuredMenu.map((row) => (
-                            <tr key={row.day} className="odd:bg-white even:bg-gray-50">
-                                <td className="border border-gray-300 px-4 py-2 font-semibold">{row.day}</td>
-                                {mealTypes.map((meal) => (
-                                    <td key={meal} className="border border-gray-300 px-4 py-2">
-                                        {row[meal]}
-                                    </td>
-                                ))}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+      <div className="flex justify-center items-center h-40">
+        <p className="text-gray-500 text-lg">Loading menu...</p>
+      </div>
     );
+
+  if (!menu)
+    return (
+      <div className="text-center mt-10 text-gray-500">
+        No menu available
+      </div>
+    );
+
+  return (
+    <div className="max-w-6xl mx-auto p-6">
+      
+      <h2 className="text-3xl font-bold text-center mb-8 text-blue-600">
+        Weekly Menu
+      </h2>
+
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {days.map((day) => (
+          <div
+            key={day}
+            className="bg-white shadow-md rounded-2xl p-5 border hover:shadow-lg transition"
+          >
+            
+            <h3 className="text-xl font-semibold capitalize mb-4 text-center text-gray-700">
+              {day}
+            </h3>
+
+            <div className="space-y-2">
+              {meals.map((meal) => (
+                <p key={meal} className="text-sm text-gray-700">
+                  <span className="font-semibold capitalize text-gray-900">
+                    {meal}:
+                  </span>{" "}
+                  {menu?.[day]?.[meal]?.length
+                    ? menu[day][meal].join(", ")
+                    : (
+                      <span className="text-gray-400 italic">
+                        Not added
+                      </span>
+                    )}
+                </p>
+              ))}
+            </div>
+
+          </div>
+        ))}
+      </div>
+
+    </div>
+  );
 };
 
 export default ViewMenu;

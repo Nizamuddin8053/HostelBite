@@ -10,7 +10,8 @@ const SidebarDashboard = ({ role }) => {
 
             {/* Right Page Area */}
             <div className="flex-1 p-6">
-                <Outlet /> {/* Renders selected page here */}
+                {/* selected page will render using outlet */}
+                <Outlet /> 
             </div>
         </div>
     );

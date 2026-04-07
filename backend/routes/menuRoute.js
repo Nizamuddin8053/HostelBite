@@ -1,30 +1,22 @@
-// routes/menu.js
+
 const express = require("express");
 const {
     createMenu,
-    getAllMenu,
-    getMenuById,
-    updateMenu,
-    deleteMenu
+    getLatestMenu,
+    updateMenu
 } = require("../controllers/Management/menuController");
 
-const {auth,isStudent, isAdmin}  = require("../middlewares/auth");
+
 
 const router = express.Router();
 
 // Add new menu item
-router.post("/", auth,isAdmin, createMenu);
-
+router.post("/create-menu",createMenu);
 // Get all menu items
-router.get("/getAll",  getAllMenu);
-
-// Get menu by ID
-router.get("/:id",  getMenuById);
+router.get("/latest-menu",  getLatestMenu);
 
 // Update menu item
-router.put("/updateMenu",  auth, isAdmin, updateMenu);
+router.patch("/update-menu", updateMenu);
 
-// Delete menu item
-router.delete("/delete",  deleteMenu);
 
 module.exports = router;

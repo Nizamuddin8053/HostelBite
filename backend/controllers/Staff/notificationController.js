@@ -22,8 +22,15 @@ exports.createNotification = async (req, res) => {
         });
       }
 
+      const student = await Student.findById({student_id});
+      if(!student){
+        return res.status(409).json({
+          message: "user not found"
+        })
+      }
+
       notifications.push({
-        studentId: student_id,
+        student_id,
         title,
         message,
       });
@@ -40,7 +47,7 @@ exports.createNotification = async (req, res) => {
       const students = await Student.find({ course, year }, "_id");
 
       notifications = students.map((student) => ({
-        studentId: student._id,
+        student_id: student._id,
         title,
         message,
       }));
@@ -51,7 +58,7 @@ exports.createNotification = async (req, res) => {
       const students = await Student.find({}, "_id");
 
       notifications = students.map((student) => ({
-        studentId: student._id,
+        student_id: student._id,
         title,
         message,
       }));
@@ -64,13 +71,13 @@ exports.createNotification = async (req, res) => {
     const result = await Notification.insertMany(notifications);
 
     res.status(201).json({
-      message: "Notification(s) created successfully",
+      message: result,
       affected: result.length,
     });
 
   } catch (err) {
     console.error(" Error creating notification:", err);
-    res.status(500).json({ error: "Database error" });
+    res.status(500).json({ error: "can't sent notification" });
   }
 };
 
@@ -96,9 +103,9 @@ exports.getNotificationsByUser = async (req, res) => {
 
     let query = {};
 
-    if (role === "student") query.studentId = userId;
-    else if (role === "staff") query.staffId = userId;
-    else if (role === "management") query.managementId = userId;
+    if (role === "student") query.student_id = userId;
+    else if (role === "staff") query.staff_id = userId;
+    else if (role === "management") query.management_id = userId;
     else {
       return res.status(400).json({ error: "Invalid role type" });
     }
@@ -120,7 +127,7 @@ exports.markAsRead = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const updated = await Notification.findByIdAndUpdate(
+    const updated = await Notification.findOneAndUpdate(
       id,
       { isRead: true },
       { new: true }

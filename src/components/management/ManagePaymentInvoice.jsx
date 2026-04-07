@@ -1,7 +1,15 @@
 
 import { CreditCard } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const ManagePaymentInvoice = () => {
+
+    const navigate  = useNavigate();
+
+    const generateInvoiceHandler = ()=>{
+        navigate("/generate-invoice");
+    }
+
     return (
         <div className="bg-white p-5 rounded-2xl shadow-md">
             <div className="flex items-center mb-3">
@@ -14,7 +22,7 @@ const ManagePaymentInvoice = () => {
             </p>
 
             <div className="flex gap-3 flex-wrap">
-                <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                <button onClick={generateInvoiceHandler} className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
                     Generate Invoice
                 </button>
                 <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">

@@ -4,27 +4,41 @@ const {
     createStaff,
     getAllStaff,
     getStaffById,
-    updateStaff,
-    deleteStaff
+    updateStaffSalary,
+    deleteStaff,
+    approveStaff,
+    getUnapprovedStaff,
+    checkApprove
 } = require("../controllers/Staff/staffController");
 
-const {auth,isStudent, isAdmin}  = require("../middlewares/auth");
+
 
 const router = express.Router();
 
 // Create staff
-router.post("/", auth, isAdmin, createStaff);
+router.post("/",  createStaff);
 
 // Get all staff
-router.get("/", auth, isAdmin, getAllStaff);
+router.get("/getAllStaff",  getAllStaff);
+
+// unapprove staff
+router.get("/unapproved", getUnapprovedStaff);
+
+router.post("/checkapprove", checkApprove);
+// Update staff
+router.put("/update-salary/:id",  updateStaffSalary);
 
 // Get staff by ID
 router.get("/:id",  getStaffById);
 
-// Update staff
-router.put("/:id",  updateStaff);
 
 // Delete staff
 router.delete("/:id",  deleteStaff);
+
+// approve staff
+router.put("/approve/:id", approveStaff);
+
+
+
 
 module.exports = router;

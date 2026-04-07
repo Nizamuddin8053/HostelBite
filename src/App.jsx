@@ -1,38 +1,89 @@
 import React from "react";
-import {Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+import PrivateRoute from "./components/auth/PrivateRoute";
+import PublicRoute from "./components/auth/PublicRoute";
+import Error from "./components/common/Error";
+import { ACCOUNT_TYPE } from "./utils/constants";
+
+
+//  ****************************************common folder import*************************************************
 
 import Navbar from "./components/common/Navbar";
+import UserNotifications from "./components/common/UserNotifications";
+import MenuSection from "./components/common/MenuSection";
+import FeedbackList from "./components/common/FeedbackList";
+import Footer from "./components/common/Footer";
+
+
+// ******************************************page folder import***************************************************
+
 import Home from "./components/pages/Home";
 import About from "./components/pages/About";
 import Services from "./components/pages/Services";
 import Contact from "./components/pages/Contact";
+
+
+
+
+// *******************************************auth folder import****************************************************
+
 import Signup from "./components/auth/Signup";
 import Login from "./components/auth/Login";
-import UserNotifications from "./components/common/UserNotifications";
+import UpdatePassword from "./components/auth/UpdatePassword";
 
-// This is a comment 
-// import student components
+
+// *********************************************dashboard folder******************************************************
+
+
+//   **********************************************8dashboard folder import(student)*************************************
+
 import StudentLayout from "./components/dashboard/StudentLayout";
 import StudentDashboard from "./components/dashboard/StudentDashboard";
+
+
+
+//   ****************************************************dashboard folder import(admin)**********************************
+
+import AdminDashboard from "./components/dashboard/AdminDashboard";
+import AdminLayout from "./components/dashboard/AdminLayout";
+
+
+
+
+//   ********************************************************dashboard folder import(staff)********************************
+
+import StaffDashboard from "./components/dashboard/StaffDashboard";
+import StaffLayout from "./components/dashboard/StaffLayout";
+
+
+
+// *****************************************************************student folder import******************************************
+
+// *****************************************************************student sections(cards)*************************************
+
 
 import ComplaintSection from "./components/student/ComplaintSection";
 import FeedbackSection from "./components/student/FeedbackSection";
 import NotificationSection from "./components/student/NotificationSection";
 import PaymentSection from "./components/student/PaymentSection";
-import MenuSection from "./components/common/Menu";
-import MarkAttendance from "./components/student/MarkAttendance";
 
 
+
+// *************************************************************student card functions*****************************************
+
+import MarkAttendance from "./components/student/studentFunctions/MarkAttendance";
 import SubmitComplaint from "./components/student/studentFunctions/SubmitComplaint";
 import SubmitFeedback from "./components/student/studentFunctions/GiveFeedback"
-import GetAllComplaintsByStudent from "./components/student/studentFunctions/GetAllComplaints";  
-import ViewMenu from "./components/management/manageFunctions/menuFunctions/ViewMenu";
+import GetAllComplaintsByStudent from "./components/student/studentFunctions/GetAllComplaints";
 import MessPayment from "./components/student/studentFunctions/MessPayment";
-import ScanQR from "./components/student/studentFunctions/ScanQR";
+import ViewInvoices from "./components/student/studentFunctions/ViewInvoices";
 
-// import admin components
-import AdminDashboard from "./components/dashboard/AdminDashboard";
-import AdminLayout from "./components/dashboard/AdminLayout";
+
+
+//  ***************************************************************admin sections (cards)***************************************
+
+//  ***********************************************************there are 6 cards**************************************************
 
 import ManageFeedbackAttendance from "./components/management/ManageFeedbackAttendance";
 import ManageMenuExpenses from "./components/management/ManageMenuExpenses";
@@ -41,137 +92,415 @@ import ManageStaffSalary from "./components/management/ManageStaffSalary";
 import ManageComplaintNotification from "./components/management/MangeComplaintNotification";
 import UserManagement from "./components/management/UserManagement";
 
-import FeedbackList from "./components/common/FeedbackList";
+// ***********************************************************admin card menu functions****************************************** 
+
 import MenuItems from "./components/management/manageFunctions/MenuItems";
-import CreateMenu from "./components/management/manageFunctions/menuFunctions/CreateMenu";
 import UpdateMenu from "./components/management/manageFunctions/menuFunctions/UpdateMenu";
-import DeleteMenu from "./components/management/manageFunctions/menuFunctions/DeleteMenu";
-import AddExpense from "./components/management/manageFunctions/expenseFunctions/AddExpense";
+import ViewMenu from "./components/management/manageFunctions/menuFunctions/ViewMenu";
+
+
+// **************************************************************admin card expense functions*******************************************8
+
 import ExpenseItems from "./components/management/manageFunctions/ExpenseItems";
+import AddExpense from "./components/management/manageFunctions/expenseFunctions/AddExpense";
 import ViewExpenses from "./components/management/manageFunctions/expenseFunctions/ViewExpenses";
+import ViewMonthlyExpenses from "./components/management/manageFunctions/expenseFunctions/ViewMonthlyExpenses"
+
+// ***********************************************************admin card complaint functions******************************************
+
 import AllComplaints from "./components/management/manageFunctions/complaintFunctions/AllComplaints";
-import QRDisplay from "./components/management/manageFunctions/attendance/QRDisplay";
+
+
+// ****************************************************admin card attendance functions*************************************************
+
+// import QRDisplay from "./components/management/manageFunctions/attendance/QRDisplay";
+
+// **************************************************admin user management functions*********************************************
+
 import RemoveStudents from "./components/management/manageFunctions/userManagement/RemoveStudents";
+import RemoveStaff from "./components/management/manageFunctions/userManagement/RemoveStaff";
+
+// ****************************************************admin notification card functions**********************************************
+
 import SendNotification from "./components/management/manageFunctions/notification/SendNotification";
 
+// *********************************************************admin payment and invoice card functions****************************
 
-// import staff components
-import StaffDashboard from "./components/dashboard/StaffDashboard";
-import StaffLayout from "./components/dashboard/StaffLayout";
+import GenerateInvoice from "./components/management/manageFunctions/paymentAndInvoice/GenerateInvoice";
+
+// ********************************************admin staff salary functions*****************************
+
+import ApproveStaff from "./components/management/manageFunctions/staffSalaryFunctions/ApproveStaff";
+import AllStaff from "./components/management/manageFunctions/staffSalaryFunctions/AllStaff";
+import UpdateStaffSalary from "./components/management/manageFunctions/staffSalaryFunctions/UpdateStaffSalary";
+
+
+
+
+// ****************************************************staff folder************************************************
+
+// ********************************************************staff card sections****************************************************
+
+
 import ComplaintNotification from "./components/staff/ComplaintNotification";
 import FeedbackAttendance from "./components/staff/FeedbackAttendance";
 import SalarySection from "./components/staff/SalarySection";
 
 
-console.log("API:" , process.env.REACT_APP_API_URL)
+
+
 
 function App() {
 
-  
-  // const token = localStorage.getItem("token");
-  // const decoded = jwtDecode(token);
-  // const role = decoded.role;
-  // const userId = decoded.id;
 
+  const token = localStorage.getItem("token");
 
- 
+  let role = null;
+  let userId = null;
+
+  if (token) {
+    try {
+      const decoded = jwtDecode(token);
+      role = decoded.role;
+      userId = decoded.id;
+    } catch (error) {
+      console.log("Invalid token");
+    }
+  }
+
 
   return (
-    <div className="min-h-screen bg-gray-100 overflow-x-hidden">
+    <div className="flex flex-col min-h-screen bg-gray-100 overflow-x-hidden">
       <Navbar />
-      <div className="p-8">
+      <div className="flex-grow ">
         <Routes>
 
 
           {/* common routes */}
 
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/services" element={<Services />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="*" element={<Navigate to="/" />} />
-          <Route path="/userNotification" element={<UserNotifications />}/>
+          <Route path="/"
+            element={
+              <PublicRoute>
+                <Home />
+              </PublicRoute>
+            } />
+
+          <Route path="/about" element={
+            <PublicRoute>
+              <About />
+            </PublicRoute>
+          } />
+
+          <Route path="/services"
+            element={
+              <PublicRoute>
+                <Services />
+              </PublicRoute>
+            } />
+
+          <Route path="/contact"
+            element={
+              <PublicRoute>
+                <Contact />
+              </PublicRoute>
+            } />
+
+          <Route path="/signup"
+            element={
+              <PublicRoute>
+                <Signup />
+              </PublicRoute>
+            } />
+
+          <Route path="/login"
+            element={
+              <PublicRoute>
+                <Login />
+              </PublicRoute>
+            } />
+
+          <Route path="/update-password"
+            element={
+              <PublicRoute>
+                <UpdatePassword />
+              </PublicRoute>
+            } />
+
+          <Route path="*"
+            element={
+              <PublicRoute>
+                <Navigate to="/" />
+              </PublicRoute>
+            } />
+
+          <Route path="/latest-menu" element={
+            <PrivateRoute allowedRoles={[ACCOUNT_TYPE.ADMIN, ACCOUNT_TYPE.STAFF, ACCOUNT_TYPE.STUDENT]}>
+              <ViewMenu />
+            </PrivateRoute>
+          } />
+          <Route path="/userNotification"
+            element={
+              <PrivateRoute allowedRoles={[ACCOUNT_TYPE.STUDENT]}>
+                <UserNotifications userId={userId} role={role} />
+              </PrivateRoute>
+            } />
 
 
-          {/* Student Routes */}
+          {/* unauthorize access page */}
+          <Route path="/unauthorized" element={<Error />} />
 
 
-          <Route path="/student-dashboard" element={<StudentLayout />}>
 
-             {/* Default dashboard */}
+
+
+          {/* protected route for student dashboard */}
+
+          <Route
+            path="/student-dashboard"
+            element={
+              <PrivateRoute allowedRoles={[ACCOUNT_TYPE.STUDENT]}>
+                <StudentLayout />
+              </PrivateRoute>
+            }
+          >
             <Route index element={<StudentDashboard />} />
-            <Route path="complaint-section" element={<ComplaintSection />}/>
-            <Route path="feedback-section" element={<FeedbackSection />}/>
-            <Route path="menu-section" element={<MenuSection />}/>
-            <Route path="notification-section" element={<NotificationSection />}/>
-            <Route path="payment-section" element={<PaymentSection />}/>
+            <Route path="complaint-section" element={<ComplaintSection />} />
+            <Route path="feedback-section" element={<FeedbackSection />} />
+            <Route path="menu-section" element={<MenuSection />} />
+            <Route path="notification-section" element={<NotificationSection />} />
+            <Route path="payment-section" element={<PaymentSection />} />
           </Route>
 
-              
 
-          {/* admin routes */}
 
-          <Route path="/admin-dashboard" element={<AdminLayout/>}>
+          {/* protected route for admin dashboard */}
+
+          <Route
+            path="/admin-dashboard"
+            element={
+              <PrivateRoute allowedRoles={[ACCOUNT_TYPE.ADMIN]}>
+                <AdminLayout />
+              </PrivateRoute>
+            }
+          >
             <Route index element={<AdminDashboard />} />
-            <Route path="feedback-section" element={<ManageFeedbackAttendance />}/>
-            <Route path="menu-section" element={<ManageMenuExpenses />}/>
-            <Route path="payments-section" element={<ManagePaymentInvoice />}/>
-            <Route path="salary-section" element={<ManageStaffSalary/>}/>
-            <Route path="complaints-section" element={<ManageComplaintNotification />}/>
-            <Route path="users-section" element={<UserManagement />}/>
+            <Route path="feedback-section" element={<ManageFeedbackAttendance />} />
+            <Route path="payments-section" element={<ManagePaymentInvoice />} />
+            <Route path="menu-expense-section" element={<ManageMenuExpenses />} />
+            <Route path="salary-section" element={<ManageStaffSalary />} />
+            <Route path="complaints-section" element={<ManageComplaintNotification />} />
+            <Route path="users-section" element={<UserManagement />} />
           </Route>
 
 
-          {/* staff routes */}
 
-          <Route path="/staff-dashboard" element={<StaffLayout/>}>
-            <Route index element={<StaffDashboard/>}/>
-            <Route path="complaints-section" element={<ComplaintNotification/>}/>
-            <Route path="feedback-section" element={<FeedbackAttendance/>}/>
-            <Route path="salary-section" element={<SalarySection/>}/>
-            <Route path="menu-section" element={<MenuSection/>}/>
+          {/* protected route for staff dashboard */}
+
+
+
+          <Route
+            path="/staff-dashboard"
+            element={
+              <PrivateRoute allowedRoles={[ACCOUNT_TYPE.STAFF]}>
+                <StaffLayout />
+              </PrivateRoute>
+            }
+          >
+            <Route index element={<StaffDashboard />} />
+            <Route path="menu-section" element={<MenuSection />} />
+            <Route path="complaints-section" element={<ComplaintNotification />} />
+            <Route path="feedback-section" element={<FeedbackAttendance />} />
+            <Route path="salary-section" element={<SalarySection />} />
           </Route>
-          
+
+
+
 
           {/* student action routes */}
-          <Route path="submit-complaint" element={<SubmitComplaint />} />
-          <Route path="submit-feedback" element={<SubmitFeedback />} />
-          <Route path="view-menu" element={<ViewMenu />} />
-          <Route path="complaints" element={<GetAllComplaintsByStudent />} /> 
-          <Route path="/student/make-payment" element={<MessPayment />} />
-          <Route path="/mark-attendance" element={<ScanQR />} />
-          <Route path="/mark-attendance" element={<MarkAttendance />} />
 
-    
+          <Route path="/submit-complaint"
+            element={
+              <PrivateRoute allowedRoles={[ACCOUNT_TYPE.STUDENT]}>
+                <SubmitComplaint />
+              </PrivateRoute>}
+          />
 
-          {/* <Route path="/student-dashboard" element={<StudentDashboard />} /> */}
-          {/* <Route path="/admin-dashboard" element={<AdminDashboard />} />
-          <Route path="/staff-dashboard" element={<StaffDashboard />} /> */}
+
+          <Route path="/submit-feedback"
+            element={
+              <PrivateRoute allowedRoles={[ACCOUNT_TYPE.STUDENT]}>
+                <SubmitFeedback />
+              </PrivateRoute>
+            }
+          />
+
+          <Route path="/complaints"
+            element={
+              <PrivateRoute allowedRoles={[ACCOUNT_TYPE.ADMIN, ACCOUNT_TYPE.STAFF, ACCOUNT_TYPE.STUDENT]}>
+                <GetAllComplaintsByStudent />
+              </PrivateRoute>
+            } />
+
+          <Route path="student/make-payment"
+            element={
+              <PrivateRoute allowedRoles={[ACCOUNT_TYPE.STUDENT]}>
+                <MessPayment />
+              </PrivateRoute>
+            } />
+
+          <Route path="/mark-attendance"
+            element={
+              <PrivateRoute allowedRoles={[ACCOUNT_TYPE.STUDENT]}>
+                <MarkAttendance />
+              </PrivateRoute>
+            } />
+
+          <Route path="/view-invoice-history"
+            element={
+              <PrivateRoute allowedRoles={[ACCOUNT_TYPE.STUDENT]}>
+                <ViewInvoices student_id={userId} />
+              </PrivateRoute>
+            } />
+
+
+
+
 
 
 
           {/* admin action routes */}
-          <Route path="/add-menu" element={<CreateMenu />} />
-          <Route path="/update-menu" element={<UpdateMenu />} />
-          <Route path="/management/menu/menu-items" element={<MenuItems />} />
-          <Route path="/delete-menu" element={<DeleteMenu />} />
-          <Route path="feedback-list" element={<FeedbackList />} />
-          <Route path="/add-expense" element={<AddExpense />} />
-          <Route path="/view-expenses" element={<ViewExpenses />} />
-          <Route path="/management/expense/expense-items" element={<ExpenseItems />} />
-          {/* Complaints  */}
-          <Route path="all-complaints" element={<AllComplaints />} />
-          <Route path="get-attendance-qr" element={<QRDisplay />} />
-          <Route path ="/remove-students" element={<RemoveStudents/>}/>
-          <Route path= "/send-notification" element={<SendNotification/>}/>
 
-          
-    
+          <Route path="/update-menu"
+            element={
+              <PrivateRoute allowedRoles={[ACCOUNT_TYPE.ADMIN]}>
+                <UpdateMenu />
+              </PrivateRoute>
+            } />
+
+          <Route path="/management/menu/menu-items"
+            element={
+              <PrivateRoute allowedRoles={[ACCOUNT_TYPE.ADMIN]}>
+                <MenuItems />
+              </PrivateRoute>
+            } />
+
+          <Route path="/feedback-list"
+            element={
+              <PrivateRoute allowedRoles={[ACCOUNT_TYPE.ADMIN, ACCOUNT_TYPE.STAFF]}>
+                <FeedbackList />
+              </PrivateRoute>
+            } />
+
+          <Route path="/add-expense"
+            element={
+              <PrivateRoute allowedRoles={[ACCOUNT_TYPE.ADMIN]}>
+                <AddExpense />
+              </PrivateRoute>
+            } />
+
+          <Route path="/view-expenses"
+            element={
+              <PrivateRoute allowedRoles={[ACCOUNT_TYPE.ADMIN]}>
+                <ViewExpenses />
+              </PrivateRoute>
+            } />
+
+          <Route path="/view-monthly-expenses"
+            element={
+              <PrivateRoute allowedRoles={[ACCOUNT_TYPE.ADMIN]}>
+                <ViewMonthlyExpenses />
+              </PrivateRoute>
+
+            } />
+
+          <Route path="/management/expense/expense-items"
+            element={
+              <PrivateRoute allowedRoles={[ACCOUNT_TYPE.ADMIN]}>
+                <ExpenseItems />
+              </PrivateRoute>
+            } />
+
+          {/* Complaints  */}
+          <Route path="/all-complaints"
+            element={
+              <PrivateRoute allowedRoles={[ACCOUNT_TYPE.ADMIN]}>
+                <AllComplaints />
+              </PrivateRoute>
+            } />
+
+          {/* <Route path="/get-attendance-qr"
+            element={
+              <PrivateRoute allowedRoles={[ACCOUNT_TYPE.ADMIN]}>
+                <QRDisplay />
+              </PrivateRoute>
+            } /> */}
+
+          <Route path="/remove-students"
+            element={
+              <PrivateRoute allowedRoles={[ACCOUNT_TYPE.ADMIN]}>
+                <RemoveStudents />
+              </PrivateRoute>
+            } />
+
+          <Route path="/remove-staff"
+            element={
+              <PrivateRoute allowedRoles={[ACCOUNT_TYPE.ADMIN]}>
+                <RemoveStaff />
+              </PrivateRoute>
+            } />
+
+
+
+          <Route path="/send-notification"
+            element={
+              <PrivateRoute allowedRoles={[ACCOUNT_TYPE.ADMIN]}>
+                <SendNotification />
+              </PrivateRoute>
+            } />
+          {/* payment and invoice */}
+
+          <Route
+            path="/generate-invoice"
+            element={
+              <PrivateRoute allowedRoles={[ACCOUNT_TYPE.ADMIN]}>
+                <GenerateInvoice />
+              </PrivateRoute>
+            }
+          />
+
+
+          {/* staff salary  */}
+
+          <Route path="/approve-staff"
+            element={
+              <PrivateRoute allowedRoles={[ACCOUNT_TYPE.ADMIN]}>
+                <ApproveStaff />
+              </PrivateRoute>
+            } />
+
+          <Route path="/get-all-staff"
+            element={
+              <PrivateRoute allowedRoles={[ACCOUNT_TYPE.ADMIN]}>
+                <AllStaff />
+              </PrivateRoute>
+            } />
+          <Route path="/update-staff-salary"
+            element={
+              <PrivateRoute allowedRoles={[ACCOUNT_TYPE.ADMIN]}>
+                <UpdateStaffSalary />
+              </PrivateRoute>
+            } />
+
+
+
 
         </Routes>
       </div>
+
+
+      <Footer/>
+
+
     </div>
   );
 }

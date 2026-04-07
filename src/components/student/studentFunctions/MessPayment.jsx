@@ -1,6 +1,8 @@
-import  { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import showToast from "../../../utils/showToast";
+import { TOAST_TYPE } from "../../../utils/constants";
 
 
 
@@ -10,15 +12,15 @@ const MessPayment = () => {
     const [paymentProcessing, setPaymentProcessing] = useState(false);
     const token = localStorage.getItem("token");
 
-    
+
     const amount = 2;
 
     useEffect(() => {
         const fetchStudentDetails = async () => {
-           
+
             const decoded = jwtDecode(token);
             const id = decoded.id;
-           
+
             try {
                 // Fetch student details using token
                 const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/students/${id}`, {
@@ -26,7 +28,7 @@ const MessPayment = () => {
                         Authorization: `Bearer ${token}`,
                     },
                 });
-               
+
                 setStudent(res.data);
             } catch (err) {
                 console.error("Error fetching student details:", err);
@@ -54,7 +56,9 @@ const MessPayment = () => {
         const res = await loadRazorpayScript("https://checkout.razorpay.com/v1/checkout.js");
 
         if (!res) {
-            alert("Razorpay SDK failed to load. Check your internet connection.");
+
+            showToast("Razorpay sdk failed to load, check your internet connection.", TOAST_TYPE.ERROR);
+
             setPaymentProcessing(false);
             return;
         }
@@ -67,13 +71,13 @@ const MessPayment = () => {
                 email: student.email,
             });
 
-            
+
             const { order } = orderRes.data;
 
-            
+
             // Configure Razorpay Checkout
             // Use razorpay API key
-            const options = {  
+            const options = {
                 key: "rzp_test_ReQ4Bym2jP3in9" || "rzp_test_xxxxxxxxxxx", // fallback for dev
                 amount: order.amount,
                 currency: "INR",
@@ -89,9 +93,14 @@ const MessPayment = () => {
                             name: student.name,
                             amount,
                         });
-                        alert("✅ Payment successful! Confirmation email sent.");
+
+                        showToast(" payment successfull! confirmation email sent!", TOAST_TYPE.SUCCESS);
+
+
                     } catch (error) {
-                        alert("Payment verification failed!");
+
+                        showToast("payment verification failed!", TOAST_TYPE.ERROR);
+                        
                     }
                 },
                 prefill: {
@@ -106,8 +115,12 @@ const MessPayment = () => {
             const rzp = new window.Razorpay(options);
             rzp.open();
         } catch (err) {
+
             console.error("Payment error:", err);
-            alert("Error starting payment.");
+
+            showToast("error starting payment!", TOAST_TYPE.ERROR);
+
+
         } finally {
             setPaymentProcessing(false);
         }

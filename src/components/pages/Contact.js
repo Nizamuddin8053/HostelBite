@@ -5,7 +5,7 @@ export default function Contact() {
     return (
         <div className="min-h-screen bg-gray-50 font-sans text-gray-800 flex flex-col">
     
-            {/* 💬 Hero Section */}
+            {/*  Hero Section */}
             <section className="text-center py-20 px-6 bg-gradient-to-b from-indigo-50 to-white">
                 <h2 className="text-4xl md:text-5xl font-extrabold text-indigo-700 mb-6">
                     Get in Touch With Us 📞
@@ -16,7 +16,7 @@ export default function Contact() {
                 </p>
             </section>
 
-            {/* 📩 Contact Form & Info */}
+            {/* Contact Form & Info */}
             <section className="py-16 px-8 bg-white">
                 <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10">
                     {/* Contact Form */}
@@ -115,7 +115,7 @@ export default function Contact() {
                 </div>
             </section>
 
-            {/* 🌟 CTA Section */}
+            {/* CTA Section */}
             <section className="py-16 bg-indigo-600 text-white text-center">
                 <h3 className="text-3xl font-semibold mb-4">We’d love to hear from you!</h3>
                 <p className="max-w-2xl mx-auto mb-6 text-indigo-100">
@@ -130,12 +130,7 @@ export default function Contact() {
                 </a>
             </section>
 
-            {/* ⚓ Footer */}
-            <footer className="bg-indigo-700 text-white text-center py-4 mt-10">
-                <p className="text-sm">
-                    © {new Date().getFullYear()} HostelBite | Made with ❤️ for hostel life
-                </p>
-            </footer>
+           
         </div>
     );
 }

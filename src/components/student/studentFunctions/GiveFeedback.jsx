@@ -1,46 +1,52 @@
 import { useState } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import showToast from "../../../utils/showToast";
+import { TOAST_TYPE } from "../../../utils/constants";
 
 const GiveFeedback = () => {
     
     const [message, setMessage] = useState("");
     const [rating, setRating] = useState(0);
-    const [status, setStatus] = useState("");
+    
 
     const token = localStorage.getItem("token");
     const decoded = jwtDecode(token);
-    const studentId = decoded.id;
+    const student_id= decoded.id;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!message) {
-            setStatus("Message is required");
+
+            showToast("message is required", TOAST_TYPE.ERROR);
+
             return;
         }
 
         try {
-            const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/feedbacks/`, {
-                student_id: studentId,
+            await axios.post(`${process.env.REACT_APP_API_URL}/api/feedbacks/`, {
+                student_id: student_id,
                 message,
                 rating,
             });
-
-            setStatus(`✅ ${res.data.message}`);
+            
+            showToast("feedback submitted successfully", TOAST_TYPE.SUCCESS);
+             
             setMessage("");
             setRating(0);
+            
         } catch (err) {
             console.error(err);
-            setStatus("❌ Failed to submit feedback. Try again.");
+
+            showToast("feedback not submitted", TOAST_TYPE.ERROR);
+            
         }
     };
 
     return (
         <div className="max-w-md mx-auto mt-10 bg-white shadow-lg rounded-2xl p-6">
             <h2 className="text-2xl font-semibold mb-4 text-center">Submit Feedback</h2>
-
-            {status && <p className="mb-4 text-center text-sm">{status}</p>}
 
             <form onSubmit={handleSubmit} className="space-y-4">
                 

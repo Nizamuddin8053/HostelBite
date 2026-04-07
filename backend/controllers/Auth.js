@@ -35,6 +35,7 @@ exports.signup = async (req, res) => {
       });
     }
 
+
     // Check if user already exists
     let existingUser;
     if (role === "student") {
@@ -57,9 +58,7 @@ exports.signup = async (req, res) => {
     if (role === "student") {
       
       if (!roomNumber || !course || !year) {
-        console.log("roomNO:",roomNumber)
-        console.log("course:",course)
-        console.log("year:",year)
+        
         return res.status(400).json({
           message: "All student fields required",
         });
@@ -136,6 +135,8 @@ exports.login = async (req, res) => {
       });
     }
 
+   
+
     let user;
 
     // Find user based on role
@@ -165,15 +166,16 @@ exports.login = async (req, res) => {
 
     // Generate JWT
     const token = jwt.sign(
-      { id: user._id, role },
+      { id: user._id, role, fullName: user.name, },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
 
     res.status(200).json({
       message: "Login successful",
-      role,
-      token,
+      role,    // no need to send separately these details in res because I have encoded 
+      token,   // these details using jwt.sign() whenever I will need I can decode all details using token
+      fullName: user.name,    // best practice to send in user:{role, token, fullName} object 
     });
 
   } catch (error) {

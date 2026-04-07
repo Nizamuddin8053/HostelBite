@@ -1,14 +1,18 @@
-import  { useState } from "react";
+import { useState } from "react";
 import axios from "axios";
-import {jwtDecode} from "jwt-decode"; 
+import { jwtDecode } from "jwt-decode";
+import showToast from "../../../utils/showToast";
+import { TOAST_TYPE } from "../../../utils/constants";
+
+
 const SubmitComplaint = () => {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
 
-    
-    const token = localStorage.getItem("token"); // assuming token is user_id for simplicity
+
+    const token = localStorage.getItem("token");
     const decoded = jwtDecode(token);
     const student_id = decoded.id;
 
@@ -24,13 +28,15 @@ const SubmitComplaint = () => {
         setMessage("");
 
         try {
-            const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/complaints/complaint`, {
+            await axios.post(`${process.env.REACT_APP_API_URL}/api/complaints/complaint`, {
                 student_id,
                 title,
                 description,
             });
 
-            setMessage(res.data.message);
+            showToast("your complaint submitted successfully!", TOAST_TYPE.SUCCESS);
+
+            
             setTitle("");
             setDescription("");
         } catch (err) {
@@ -41,7 +47,7 @@ const SubmitComplaint = () => {
         } finally {
             setLoading(false);
         }
-        
+
     };
 
     return (
@@ -53,8 +59,8 @@ const SubmitComplaint = () => {
             {message && (
                 <p
                     className={`text-center mb-4 ${message.toLowerCase().includes("success")
-                            ? "text-green-600"
-                            : "text-red-500"
+                        ? "text-green-600"
+                        : "text-red-500"
                         }`}
                 >
                     {message}

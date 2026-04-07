@@ -6,6 +6,7 @@ const staffSchema = new mongoose.Schema({
   email: { type: String, unique: true },
   password: String,
   salaryAmount: Number,
+  approved: {type: Boolean, default: false},
   managementId: { type: mongoose.Schema.Types.ObjectId, ref: "Management" }
 },
 {timestamps: true}

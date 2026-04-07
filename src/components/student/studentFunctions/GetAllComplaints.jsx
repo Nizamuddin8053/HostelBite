@@ -1,37 +1,50 @@
 import { useState } from "react";
 import axios from "axios";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
+import showToast from "../../../utils/showToast";
+import { TOAST_TYPE } from "../../../utils/constants";
 
-const ViewComplaints = () => {
+const GetAllComplaints = () => {
     const [complaints, setComplaints] = useState([]);
-    const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(false);
 
     const handleFetchComplaints = async () => {
         setLoading(true);
-        setMessage("");
+
 
         try {
             const token = localStorage.getItem("token");
 
-            // Decode token to know user id and role (optional)
+
             const decoded = jwtDecode(token);
             const student_id = decoded.id;
 
+
             // Send request with token in Authorization header
             const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/complaints/complaint/${student_id}`, {
-               student_id,
+                student_id,
             })
 
-            setComplaints(res.data.complaints || []);
-            setMessage("Complaints fetched successfully!");
+            setComplaints(res.data.complaints);
 
             
+            if (complaints.length > 0) {
+                showToast("Complaints fetched successfully!", TOAST_TYPE.SUCCESS);
+                
+
+            } else {
+
+                showToast("no complaint to fetch", TOAST_TYPE.INFO);
+                
+
+            }
+
+
         } catch (err) {
-            console.error(err);
-            setMessage(
-                err.response?.data?.message || "Failed to fetch complaints. Try again."
-            );
+
+            showToast(err.response?.data?.message || "Failed to fetch complaints. Try again.", TOAST_TYPE.ERROR);
+
+
         } finally {
             setLoading(false);
         }
@@ -51,47 +64,90 @@ const ViewComplaints = () => {
                 {loading ? "Loading..." : "Get All Complaints"}
             </button>
 
-            {message && (
-                <p className="text-center mt-4 text-gray-700 font-medium">{message}</p>
-            )}
+
 
             {complaints.length > 0 && (
-                <table className="w-full mt-6 border border-gray-300 text-sm">
-                    <thead className="bg-gray-100">
-                        <tr>
-                            <th className="p-2 border">ID</th>
-                            <th className="p-2 border">Title</th>
-                            <th className="p-2 border">Description</th>
-                            <th className="p-2 border">Status</th>
-                            <th className="p-2 border">Submitted At</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {complaints.map((c) => (
-                            <tr key={c.complaint_id}>
-                                <td className="border p-2 text-center">{c.complaint_id}</td>
-                                <td className="border p-2">{c.title}</td>
-                                <td className="border p-2">{c.description}</td>
-                                <td
-                                    className={`border p-2 text-center font-medium ${c.status === "Pending"
+                <div className="overflow-x-auto">
+                    <table className="w-full mt-6 border border-gray-300 text-sm">
+
+                        {/* HEADER */}
+                        <thead className="bg-gray-100">
+                            <tr>
+                                <th className="p-2 border">ID</th>
+                                <th className="p-2 border">Title</th>
+                                <th className="p-2 border">Description</th>
+                                <th className="p-2 border">Status</th>
+                                <th className="p-2 border">Submitted At</th>
+                                <th className="p-2 border">Response</th>
+                                <th className="p-2 border">Resolved At</th>
+                            </tr>
+                        </thead>
+
+                        {/* BODY */}
+                        <tbody>
+                            {complaints.map((c) => (
+                                <tr key={c.complaint_id}>
+
+                                    <td className="border p-2 text-center">
+                                        {c.complaint_id}
+                                    </td>
+
+                                    <td className="border p-2 font-medium">
+                                        {c.title}
+                                    </td>
+
+                                    <td className="border p-2">
+                                        {c.description}
+                                    </td>
+
+                                    {/* STATUS */}
+                                    <td
+                                        className={`border p-2 text-center font-medium ${c.status === "Pending"
                                             ? "text-yellow-600"
                                             : c.status === "Resolved"
                                                 ? "text-green-600"
                                                 : "text-gray-600"
-                                        }`}
-                                >
-                                    {c.status}
-                                </td>
-                                <td className="border p-2 text-center">
-                                    {new Date(c.submitted_at).toLocaleString()}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                                            }`}
+                                    >
+                                        {c.status}
+                                    </td>
+
+                                    {/* SUBMITTED */}
+                                    <td className="border p-2 text-center">
+                                        {c.submittedAt
+                                            ? new Date(c.submittedAt).toLocaleString()
+                                            : "N/A"}
+                                    </td>
+
+                                    {/* RESPONSE */}
+                                    <td className="border p-2 text-center">
+                                        {c.response ? (
+                                            c.response
+                                        ) : (
+                                            <span className="text-gray-400">No response</span>
+                                        )}
+                                    </td>
+
+                                    {/* RESOLVED AT */}
+                                    <td className="border p-2 text-center">
+                                        {c.respondedAt ? (
+                                            <span className="text-green-600 font-medium">
+                                                {new Date(c.respondedAt).toLocaleString()}
+                                            </span>
+                                        ) : (
+                                            <span className="text-gray-400">Pending</span>
+                                        )}
+                                    </td>
+
+                                </tr>
+                            ))}
+                        </tbody>
+
+                    </table>
+                </div>
             )}
         </div>
     );
 };
 
-export default ViewComplaints;
+export default GetAllComplaints;

@@ -6,9 +6,13 @@ import { useNavigate } from "react-router-dom";
 const UserManagement = () => {
     const navigate = useNavigate();
 
-    const removeHandler = ()=>{
+    const removeStudentHandler = ()=>{
         navigate("/remove-students");
 
+    }
+
+    const removeStaffHandler = ()=>{
+        navigate("/remove-staff");
     }
 
 
@@ -25,10 +29,10 @@ const UserManagement = () => {
 
             <div className="flex gap-3 flex-wrap">
 
-                <button onClick={removeHandler} className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
+                <button onClick={removeStudentHandler} className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
                     Remove Student
                 </button>
-                <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                <button onClick={removeStaffHandler} className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
                     Remove Staff
                 </button>
             </div>

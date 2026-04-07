@@ -1,8 +1,12 @@
 
 import { FileSpreadsheet } from "lucide-react";
 
+
 const SalarySection =({ role })=> {
-    const isAdmin = localStorage.getItem("role") === "admin";
+
+
+
+    const isAdmin  = role === "admin";
 
     return (
         <div className="bg-white p-5 rounded-2xl shadow-md">

@@ -10,7 +10,7 @@ const About =()=> {
         <div className="min-h-screen bg-gray-50 font-sans text-gray-800 flex flex-col">
             
 
-            {/* 🧠 About Section */}
+            {/* About Section */}
             <section className="text-center py-20 px-6 bg-gradient-to-b from-indigo-50 to-white">
                 <h2 className="text-4xl md:text-5xl font-extrabold text-indigo-700 mb-6">
                     About HostelBite 🍴
@@ -22,7 +22,7 @@ const About =()=> {
                 </p>
             </section>
 
-            {/* 🌍 Mission, Vision, Values */}
+            {/*  Mission, Vision, Values */}
             <section className="py-16 px-6 bg-white">
                 <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
                     {/* Mission */}
@@ -57,7 +57,7 @@ const About =()=> {
                 </div>
             </section>
 
-            {/* 🍽️ Features Section */}
+            {/*  Features Section */}
             <section className="py-20 bg-indigo-50 px-8">
                 <h3 className="text-3xl font-semibold text-center text-indigo-700 mb-12">
                     What Makes HostelBite Special
@@ -102,7 +102,7 @@ const About =()=> {
                 </div>
             </section>
 
-            {/* 👨‍🍳 Team / Contact Section */}
+            {/* Team / Contact Section */}
             <section className="py-16 px-8 bg-white">
                 <h3 className="text-3xl font-semibold text-center text-indigo-700 mb-12">
                     Meet the HostelBite Team
@@ -182,12 +182,6 @@ const About =()=> {
                 </div>
             </section>
 
-            {/* ⚓ Footer */}
-            <footer className="bg-indigo-700 text-white text-center py-4 mt-10">
-                <p className="text-sm">
-                    © {new Date().getFullYear()} HostelBite | Made with ❤️ for hostel life
-                </p>
-            </footer>
         </div>
     );
 }

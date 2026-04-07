@@ -1,5 +1,6 @@
 import  { useEffect, useState } from "react";
 import axios from "axios";
+import { TOTAL_BUDGET } from "../../../../utils/constants";
 
 const ViewExpenses = () => {
     const [expenses, setExpenses] = useState([]);
@@ -7,7 +8,8 @@ const ViewExpenses = () => {
     const [categoryBreakdown, setCategoryBreakdown] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const totalBudget = 50000; // Example budget 
+    
+    const totalBudget = TOTAL_BUDGET; 
 
     useEffect(() => {
         const fetchData = async () => {

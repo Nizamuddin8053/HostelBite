@@ -1,27 +1,69 @@
 const Invoice = require("../../models/Invoice");
 
+const Student = require("../../models/Student");
+
 // create invoice
 
 exports.createInvoice = async (req, res) => {
     try {
-        const { student_id, amount, due_date, status } = req.body;
+        const { student_id, course, year, amount, due_date, status } = req.body;
 
-        if (!student_id || !amount || !due_date) {
+        if (!amount || !due_date) {
             return res.status(400).json({
-                error: "Student ID, amount, and due date are required"
+                error: "Amount and due date are required"
             });
         }
 
-        const invoice = await Invoice.create({
-            student_id,
-            amount,
-            due_date,
-            status: status || "unpaid"
-        });
+
+
+        let students = [];
+
+        //  Case 1: Single Student
+        if (student_id) {
+            const student = await Student.findById(student_id);
+            if (!student) {
+                return res.status(404).json({ error: "Student not found" });
+            }
+            students.push(student);
+        }
+
+        // Case 2: Course or Course + Year
+        else if (course) {
+            const filter = { course };
+
+            if (year) {
+                filter.year = year;
+            }
+
+            students = await Student.find(filter);
+
+            if (students.length === 0) {
+                return res.status(404).json({
+                    error: "No students found for given criteria"
+                });
+            }
+        }
+
+        // No valid input
+        else {
+            return res.status(400).json({
+                error: "Provide either student_id OR course (with optional year)"
+            });
+        }
+
+        // Create invoices in bulk
+        const invoices = students.map((student) => ({
+            student_id: student._id,
+                amount,
+                due_date,
+                status: status || "unpaid"
+        }));
+
+        const createdInvoices = await Invoice.insertMany(invoices);
 
         res.status(201).json({
-            message: "Invoice created successfully",
-            invoiceId: invoice._id
+            message: `Invoices created for ${createdInvoices.length} student(s)`,
+            invoices: createdInvoices
         });
 
     } catch (err) {
@@ -79,14 +121,31 @@ exports.getInvoiceById = async (req, res) => {
 
 // get invoices by student
 
+
+
 exports.getInvoicesByStudent = async (req, res) => {
     try {
-        const { studentId } = req.params;
+        const { student_id} = req.params;
 
-        const invoices = await Invoice.find({ student_id: studentId })
+        const studentExist = await Student.findById(student_id);
+
+        //  Validate ObjectId
+        if (!studentExist) {
+            return res.status(400).json({ error: "Invalid student ID" });
+        }
+
+        const invoices = await Invoice.find( student_id )
             .sort({ createdAt: -1 });
 
-        res.status(200).json(invoices);
+        // Calculate total unpaid
+        const totalUnpaid = invoices
+            .filter(inv => inv.status === "unpaid")
+            .reduce((sum, inv) => sum + inv.amount, 0);
+
+        res.status(200).json({
+            invoices,
+            totalUnpaid
+        });
 
     } catch (err) {
         console.error("Error fetching student invoices:", err);

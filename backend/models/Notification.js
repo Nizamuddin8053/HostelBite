@@ -8,9 +8,9 @@ const notificationSchema = new mongoose.Schema(
 
   isRead: { type: Boolean, default: false }, 
 
-  managementId: { type: mongoose.Schema.Types.ObjectId, ref: "Management" },
-  staffId: { type: mongoose.Schema.Types.ObjectId, ref: "Staff" },
-  studentId: { type: mongoose.Schema.Types.ObjectId, ref: "Student" }
+  management_id: { type: mongoose.Schema.Types.ObjectId, ref: "Management" },
+  staff_id: { type: mongoose.Schema.Types.ObjectId, ref: "Staff" },
+  student_id: { type: mongoose.Schema.Types.ObjectId, ref: "Student" }
 },
 { timestamps: true }
 );

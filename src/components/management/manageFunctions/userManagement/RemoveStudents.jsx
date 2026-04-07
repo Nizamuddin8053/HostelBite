@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import axios from "axios";
+import showToast from "../../../../utils/showToast";
+import { TOAST_TYPE } from "../../../../utils/constants";
 
 const RemoveStudents = () => {
     const [students, setStudents] = useState([]);
@@ -28,13 +30,19 @@ const RemoveStudents = () => {
         try {
             
             await axios.delete(`${process.env.REACT_APP_API_URL}/api/students/${student_id}`);
-            alert("Student deleted successfully!");
+
+            showToast("Student removed successfully!", TOAST_TYPE.SUCCESS);
+            
             fetchStudents();
         } catch (err) {
             console.error("Error deleting student:", err);
-            alert("Error deleting student");
+
+            showToast("Error deleting student", TOAST_TYPE.ERROR);
+            
         }
     };
+
+    // console.log("course is :", course, "year is :", year)
 
     // Delete all students by course and year
     const deleteByCourseAndYear = async () => {
@@ -42,14 +50,16 @@ const RemoveStudents = () => {
         if (!window.confirm(`Remove all students from ${course} - Year ${year}?`)) return;
 
         try {
-            await axios.delete(`${process.env.REACT_APP_API_URL}/api/students/deleteCourseYear`, {
-                data: {
-                    course,
-                    year
-                }
-                
+            const res = await axios.delete(`${process.env.REACT_APP_API_URL}/api/students/deleteCourseYear`, {
+               data: {
+                course,
+                year
+               }
             });
-            alert("All students of selected course and year deleted!");
+            console.log("res is:", res)
+
+            showToast("All students of selected course and year removed!", TOAST_TYPE.INFO );
+            
             fetchStudents();
         } catch (err) {
             console.error("Error deleting students by course/year:", err);
@@ -65,6 +75,8 @@ const RemoveStudents = () => {
         );
     });
 
+
+    
     return (
         <div className="p-6">
             <h2 className="text-2xl font-semibold mb-6 text-gray-800 flex items-center gap-2">
@@ -107,7 +119,6 @@ const RemoveStudents = () => {
                 <table className="min-w-full border border-gray-200 text-sm text-gray-700">
                     <thead className="bg-gray-100 text-gray-700 uppercase text-sm">
                         <tr>
-                            <th className="px-4 py-3 text-left border-b">ID</th>
                             <th className="px-4 py-3 text-left border-b">Name</th>
                             <th className="px-4 py-3 text-left border-b">Email</th>
                             <th className="px-4 py-3 text-left border-b">Course</th>
@@ -120,18 +131,18 @@ const RemoveStudents = () => {
                         {filteredStudents.length > 0 ? (
                             filteredStudents.map((s) => (
                                 <tr
-                                    key={s.student_id}
+                                    key={s._id}
                                     className="hover:bg-gray-50 transition duration-150"
                                 >
-                                    <td className="px-4 py-2 border-b">{s.student_id}</td>
+                                    
                                     <td className="px-4 py-2 border-b">{s.name}</td>
                                     <td className="px-4 py-2 border-b">{s.email}</td>
                                     <td className="px-4 py-2 border-b">{s.course}</td>
                                     <td className="px-4 py-2 border-b">{s.year}</td>
-                                    <td className="px-4 py-2 border-b">{s.room_number}</td>
+                                    <td className="px-4 py-2 border-b">{s.roomNumber}</td>
                                     <td className="px-4 py-2 border-b text-center">
                                         <button
-                                            onClick={() => deleteStudent(s.student_id)}
+                                            onClick={() => deleteStudent(s._id)}
                                             className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md transition duration-200"
                                         >
                                             Remove

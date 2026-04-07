@@ -8,12 +8,12 @@ const {
     deleteNotification
 } = require("../controllers/Staff/notificationController");
 
-const {auth,isStudent, isAdmin}  = require("../middlewares/auth");
+
 
 const router = express.Router();
 
 // Create new notification
-router.post("/createNotification",  auth, isAdmin, createNotification);
+router.post("/createNotification", createNotification);
 
 // Get all notifications
 router.get("/",  getAllNotifications);

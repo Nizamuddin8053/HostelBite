@@ -9,12 +9,12 @@ const {
     deleteInvoice
 } = require("../controllers/Student/invoiceController");
 
-// const {auth,isStudent, isAdmin}  = require("../middlewares/auth");
+
 
 const router = express.Router();
 
 // Create new invoice
-router.post("/", createInvoice);
+router.post("/create", createInvoice);
 
 // Get all invoices
 router.get("/",  getAllInvoices);
@@ -23,7 +23,7 @@ router.get("/",  getAllInvoices);
 router.get("/:id",  getInvoiceById);
 
 // Get invoices by student
-router.get("/student/:studentId",  getInvoicesByStudent);
+router.get("/student/:student_id",  getInvoicesByStudent);
 
 // Update invoice status
 router.put("/:id/status",  updateInvoiceStatus);

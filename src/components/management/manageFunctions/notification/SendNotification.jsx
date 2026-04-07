@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import showToast from "../../../../utils/showToast";
+import { TOAST_TYPE } from "../../../../utils/constants";
 
 const SendNotification = () => {
     const [students, setStudents] = useState([]);
     const [formData, setFormData] = useState({
         targetType: "all", // all | single | group
-        user_id: "",
+        student_id: "",
         course: "",
         year: "",
         title: "",
@@ -31,10 +33,15 @@ const SendNotification = () => {
 
         try {
             const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/notification/createNotification`, formData);
-            alert(res.data.message || "Notification sent successfully!");
+           
+            if(res.data?.affected>0){
+
+                showToast("notification sent successfully", TOAST_TYPE.SUCCESS);
+                
+            }
             setFormData({
                 targetType: "all",
-                user_id: "",
+                student_id: "",
                 course: "",
                 year: "",
                 title: "",
@@ -42,9 +49,16 @@ const SendNotification = () => {
             });
         } catch (error) {
             console.error("Error sending notification:", error);
-            alert("Failed to send notification");
+            if(error?.error=== 0){
+
+                showToast("can't sent notification", TOAST_TYPE.ERROR);
+               
+            }
+            
         }
     };
+
+    
 
     return (
         <div className="p-6 bg-gray-100 min-h-screen">
@@ -73,14 +87,14 @@ const SendNotification = () => {
                     <div className="mb-4">
                         <label className="font-medium block mb-1">Select Student</label>
                         <select
-                            name="user_id"
-                            value={formData.user_id}
+                            name="student_id"
+                            value={formData.student_id}
                             onChange={handleChange}
                             className="w-full border rounded p-2"
                         >
                             <option value="">Select Student</option>
                             {students.map((s) => (
-                                <option key={s.student_id} value={s.student_id}>
+                                <option key={s._id} value={s._id}>
                                     {s.name} ({s.course}-{s.year})
                                 </option>
                             ))}

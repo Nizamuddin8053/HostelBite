@@ -1,10 +1,12 @@
 const crypto = require("crypto");
 const { instance } = require("../config/razorpay");
-const nodemailer = require("nodemailer");
+const {mailSender} = require("../utils/mailSender");
+const {paymentSuccessTemplate} = require("../mailTemplates/paymentSuccessTemplate");
 
 exports.createOrder = async (req, res) => {
     try {
         const { amount, name, email } = req.body; // amount in rupees
+
         const options = {
             amount: Number(amount * 100), // Razorpay works in paise
             currency: "INR",
@@ -41,7 +43,23 @@ exports.verifyPayment = async (req, res) => {
 
         if (expectedSignature === razorpay_signature) {
             // ✅ Signature verified -> Send verification email
-            await sendVerificationEmail(email, name, amount, razorpay_payment_id);
+
+            // send payment success mail
+
+            const htmlBody = paymentSuccessTemplate({
+                razorpay_payment_id,
+                email,
+                name,
+                amount
+            });
+
+            mailSender(
+                "Payment confirmation email",
+                email,
+                htmlBody
+            );
+            
+            
             res.status(200).json({ success: true, message: "Payment verified successfully" });
         } else {
             res.status(400).json({ success: false, message: "Payment verification failed" });
@@ -52,30 +70,6 @@ exports.verifyPayment = async (req, res) => {
     }
 };
 
-// 📧 Helper function to send email
-const sendVerificationEmail = async (email, name, amount, paymentId) => {
-    const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-        },
-    });
 
-    const mailOptions = {
-        from: `"Mess Fees Payment" <${process.env.EMAIL_USER}>`,
-        to: email,
-        subject: "Mess Fees Payment Confirmation",
-        html: `
-      <h2>Hello ${name},</h2>
-      <p>Thank you for paying your <b>Mess Fees</b>.</p>
-      <p><b>Payment ID:</b> ${paymentId}</p>
-      <p><b>Amount Paid:</b> ₹${amount}</p>
-      <p>Your payment has been successfully received.</p>
-      <br/>
-      <p>Regards,<br/>Mess Management Team</p>
-    `,
-    };
 
-    await transporter.sendMail(mailOptions);
-};
+

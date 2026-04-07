@@ -3,7 +3,7 @@
 
 import ComplaintSection from "../student/ComplaintSection";
 import FeedbackSection from "../student/FeedbackSection";
-import MenuSection from "../common/Menu";
+import MenuSection from "../common/MenuSection";
 import NotificationSection from "../student/NotificationSection";
 import PaymentSection from "../student/PaymentSection";
 

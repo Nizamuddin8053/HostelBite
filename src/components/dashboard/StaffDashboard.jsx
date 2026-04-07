@@ -2,7 +2,7 @@
 // import Sidebar from "../common/Sidebar";
 import SalarySection from "../staff/SalarySection";
 import NotificationSection from "../staff/ComplaintNotification";
-import MenuSection from "../common/Menu";
+import MenuSection from "../common/MenuSection";
 import FeedbackSection from "../staff/FeedbackAttendance";
 
 const StaffDashboard =()=> {

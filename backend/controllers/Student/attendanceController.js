@@ -1,75 +1,98 @@
 const Student = require("../../models/Student");
-const Menu = require("../../models/Menu");
+const Attendance = require("../../models/Attendance");
+
 
 // mark attendance
 exports.markAttendance = async (req, res) => {
   try {
-    const { student_id, menu_id, meal_type, token } = req.body;
+    const { email, menu_id, meal_type ,token } = req.body;
 
-    if (!student_id || !menu_id || !meal_type || !token) {
+    // 1. Validate input
+    if (!email || !menu_id || !meal_type || !token) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    const date = new Date().toISOString().split("T")[0];
+    const validToken = await QRToken.findOne({ token });
 
-    // Find student
-    const student = await Student.findById(student_id);
+    if (!validToken) {
+      return res.status(401).json({ message: "Invalid QR" });
+    }
 
+    if (new Date() > validToken.expiresAt) {
+      return res.status(401).json({ message: "QR expired" });
+    }
+
+
+    const today = new Date().toISOString().split("T")[0];
+
+    // 2. Check student exists
+    const student = await Student.findOne({email});
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
     }
 
-    // Check if already marked
-    const alreadyMarked = student.attendance.find(
-      (a) =>
-        a.date.toISOString().split("T")[0] === date &&
-        a.mealType === meal_type
-    );
+    // 3. (Optional) Validate token (if you're using QR or daily token)
+    // Example:
+    // if (token !== process.env.MESS_TOKEN) {
+    //   return res.status(401).json({ message: "Invalid token" });
+    // }
 
-    if (alreadyMarked) {
-      return res.status(200).json({ message: "Attendance already marked" });
-    }
-
-    // Add attendance
-    student.attendance.push({
-      date,
+    // 4. Prevent duplicate attendance (same student + same meal + same date)
+    const alreadyMarked = await Attendance.findOne({
+      email,
       mealType: meal_type,
-      status: "present",
-      menuId: menu_id,
+      date: today,
     });
 
-    await student.save();
+    if (alreadyMarked) {
+      return res.status(400).json({
+        message: `Attendance already marked for ${meal_type}`,
+      });
+    }
 
-    res.status(201).json({ message: "Attendance marked successfully" });
+    // 5. Create attendance
+    const attendance = await Attendance.create({
+      email_student: email,
+      menuId: menu_id,
+      mealType: meal_type,
+      date: today,
+      status: "Present",
+    });
+
+    res.status(201).json({
+      message: "Attendance marked successfully",
+      attendance,
+    });
 
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Server Error", error });
   }
 };
-
 
 // get all attendance
 
 exports.getAllAttendance = async (req, res) => {
   try {
-    const students = await Student.find().populate("attendance.menuId");
+    const allAttendances = await Attendance.find()
+      .populate("student_id", "name course year email")
+      .populate("menuId", "day mealType")
+      .sort({ createdAt: -1 }).lean();
 
-    const allAttendance = [];
-
-    students.forEach((student) => {
-      student.attendance.forEach((att) => {
-        allAttendance.push({
-          studentName: student.name,
-          date: att.date,
-          mealType: att.mealType,
-          status: att.status,
-          menuItems: att.menuId?.items || null,
-        });
-      });
+    const result = allAttendances.map((attendance) => {
+      return {
+        studentName: attendance.student_id?.name || "N/A",
+        course: attendance.student_id?.course || "N/A",
+        year: attendance.student_id?.year || "N/A",
+        email: attendance.student_id?.email || "N/A",
+        day: attendance.menuId?.day || "N/A",
+        mealType: attendance.menuId?.mealType || "N/A",
+        status: attendance.status || "N/A",
+        date: attendance.date || "N/A",
+      };
     });
 
-    res.status(200).json(allAttendance);
-
+    res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ message: "Server Error", error });
   }
@@ -79,82 +102,88 @@ exports.getAllAttendance = async (req, res) => {
 
 exports.getAttendanceByStudent = async (req, res) => {
   try {
-    const { studentId } = req.params;
+    const { student_id } = req.params;
 
-    const student = await Student.findById(studentId).populate("attendance.menuId");
+    const student = await Student.findById(student_id);
 
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
     }
 
-    const attendance = student.attendance.map((att) => ({
-      date: att.date,
-      mealType: att.mealType,
-      status: att.status,
-      menuItems: att.menuId?.items || null,
-    }));
+    const attendances = await Attendance.find({ student_id: student_id }).populate("student_id", "name course year").
+      populate("menuId", "day mealType").sort({ createdAt: -1 });
 
-    res.status(200).json(attendance);
+    const result = attendances.map((a) => {
+      return {
+        studentName: a.student_id?.name,
+        course: a.student_id?.course,
+        year: a.student_id?.year,
+        day: a.menuId?.day,
+        mealType: a.menuId?.mealType,
+      }
+    })
 
-  } catch (error) {
-    res.status(500).json({ message: "Server Error", error });
-  }
-};
-
-// update attendance 
-
-exports.updateAttendance = async (req, res) => {
-  try {
-    const { id } = req.params; // attendance subdocument id
-    const { status } = req.body;
-
-    if (!status) {
-      return res.status(400).json({ message: "Status is required" });
-    }
-
-    const student = await Student.findOne({
-      "attendance._id": id,
-    });
-
-    if (!student) {
-      return res.status(404).json({ message: "Attendance not found" });
-    }
-
-    const attendance = student.attendance.id(id);
-    attendance.status = status;
-
-    await student.save();
-
-    res.status(200).json({ message: "Attendance updated successfully" });
+    res.status(200).json(result);
 
   } catch (error) {
     res.status(500).json({ message: "Server Error", error });
   }
 };
 
-// delete attendance 
+// update attendance
 
-exports.deleteAttendance = async (req, res) => {
-  try {
-    const { id } = req.params;
+// exports.updateAttendance = async (req, res) => {
+//   try {
+//     const { id } = req.params; // attendance subdocument id
+//     const { status } = req.body;
 
-    const student = await Student.findOne({
-      "attendance._id": id,
-    });
+//     if (!status) {
+//       return res.status(400).json({ message: "Status is required" });
+//     }
 
-    if (!student) {
-      return res.status(404).json({ message: "Attendance not found" });
-    }
+//     const student = await Student.findOne({
+//       "attendance._id": id,
+//     });
 
-    student.attendance = student.attendance.filter(
-      (att) => att._id.toString() !== id
-    );
+//     if (!student) {
+//       return res.status(404).json({ message: "Attendance not found" });
+//     }
 
-    await student.save();
+//     const attendance = student.attendance.id(id);
+//     attendance.status = status;
 
-    res.status(200).json({ message: "Attendance deleted successfully" });
+//     await student.save();
 
-  } catch (error) {
-    res.status(500).json({ message: "Server Error", error });
-  }
-};
+//     res.status(200).json({ message: "Attendance updated successfully" });
+
+//   } catch (error) {
+//     res.status(500).json({ message: "Server Error", error });
+//   }
+// };
+
+// // delete attendance
+
+// exports.deleteAttendance = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+
+//     const student = await Student.findOne({
+//       "attendance._id": id,
+//     });
+
+//     if (!student) {
+//       return res.status(404).json({ message: "Attendance not found" });
+//     }
+
+//     student.attendance = student.attendance.filter(
+//       (att) => att._id.toString() !== id
+//     );
+
+//     await student.save();
+
+//     res.status(200).json({ message: "Attendance deleted successfully" });
+
+//   } catch (error) {
+//     res.status(500).json({ message: "Server Error", error });
+//   }
+// };

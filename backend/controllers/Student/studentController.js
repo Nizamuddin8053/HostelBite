@@ -72,7 +72,8 @@ exports.deleteStudent = async (req, res) => {
 
     res.status(200).json({ message: "Student deleted successfully" });
   } catch (err) {
-    res.status(500).json({ message: "Error deleting student", error: err });
+    console.log("error is", err)
+    res.status(500).json({ message: "internal server error", err });
   }
 };
 
@@ -82,7 +83,14 @@ exports.deleteByCourseAndYear = async (req, res) => {
   try {
     const { course, year } = req.body;
 
-    const result = await Student.deleteMany({ course, year });
+    console.log("course ", course, "year is", year);
+
+    // course MCA, mca , Mca regex treat same all 
+
+    const result = await Student.deleteMany({
+      course: { $regex: `^${course}$`, $options: "i" },
+      year,
+    });
 
     if (result.deletedCount === 0) {
       return res.status(404).json({
@@ -101,3 +109,30 @@ exports.deleteByCourseAndYear = async (req, res) => {
   }
 };
 
+
+// search student controller
+
+exports.searchStudents = async (req, res) => {
+  try {
+    const { q } = req.query;
+
+    if (!q) return res.json([]);
+
+    const students = await Student.find({
+      $or: [
+        { name: { $regex: q, $options: "i" } },
+        { course: { $regex: q, $options: "i" } },
+        { email: { $regex: q, $options: "i" } },
+        {
+          year: isNaN(q) ? undefined : Number(q), // ✅ FIX for year
+        },
+      ].filter(Boolean),
+    })
+      .limit(20)
+      .select("name course year email");
+
+    res.json(students);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
