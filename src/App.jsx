@@ -32,7 +32,6 @@ import Signup from "./components/auth/Signup";
 import Login from "./components/auth/Login";
 import UpdatePassword from "./components/auth/UpdatePassword";
 
-
 // *********************************************dashboard folder******************************************************
 
 
