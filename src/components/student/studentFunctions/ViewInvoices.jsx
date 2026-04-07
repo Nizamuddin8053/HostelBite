@@ -6,22 +6,21 @@ const ViewInvoices = ({ student_id }) => {
   const [totalUnpaid, setTotalUnpaid] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  const fetchInvoices = async () => {
-    try {
-      const res = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/invoice/student/${student_id}`
-      );
-
-      setInvoices(res.data.invoices);
-      setTotalUnpaid(res.data.totalUnpaid);
-    } catch (err) {
-      console.error(err);
-    }
-    setLoading(false);
-  };
-
   useEffect(() => {
-    
+    const fetchInvoices = async () => {
+      try {
+        const res = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/invoice/student/${student_id}`
+        );
+
+        setInvoices(res.data.invoices);
+        setTotalUnpaid(res.data.totalUnpaid);
+      } catch (err) {
+        console.error(err);
+      }
+      setLoading(false);
+    };
+
     if (student_id) {
       fetchInvoices();
     }
@@ -63,11 +62,10 @@ const ViewInvoices = ({ student_id }) => {
 
               <div>
                 <span
-                  className={`px-3 py-1 text-sm rounded ${
-                    inv.status === "paid"
-                      ? "bg-green-200 text-green-700"
-                      : "bg-yellow-200 text-yellow-700"
-                  }`}
+                  className={`px-3 py-1 text-sm rounded ${inv.status === "paid"
+                    ? "bg-green-200 text-green-700"
+                    : "bg-yellow-200 text-yellow-700"
+                    }`}
                 >
                   {inv.status}
                 </span>
