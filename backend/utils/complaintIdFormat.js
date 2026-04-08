@@ -6,6 +6,7 @@ exports.formatComplaintId = (id) => {
   const formattedDate = date.toLocaleDateString("en-IN");
   const formattedTime = date.toLocaleTimeString("en-IN");
 
+  
   return `CMP-${formattedDate.replaceAll("/", "")}-${formattedTime.replaceAll(":", "")}`;
 };
 
