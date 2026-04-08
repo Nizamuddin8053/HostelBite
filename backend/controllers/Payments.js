@@ -1,6 +1,6 @@
 const crypto = require("crypto");
 const { instance } = require("../config/razorpay");
-const {mailSender} = require("../utils/mailSender");
+const {mailSender} = require("../utils/mailSender.js");
 const {paymentSuccessTemplate} = require("../mailTemplates/paymentSuccessTemplate");
 
 exports.createOrder = async (req, res) => {

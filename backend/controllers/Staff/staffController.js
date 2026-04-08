@@ -1,6 +1,6 @@
 const Staff = require("../../models/Staff");
 const { sendEmailMessage } = require("../../mailTemplates/commonMailTemplate");
-const { mailSender } = require("../../utils/mailSender");
+const { mailSender } = require("../../utils/mailSender.js");
 
 // Create new staff
 exports.createStaff = async (req, res) => {

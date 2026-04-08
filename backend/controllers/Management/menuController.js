@@ -1,6 +1,6 @@
 const WeeklyMenu = require("../../models/Menu");
 const {sendEmailMessage} = require("../../mailTemplates/commonMailTemplate");
-const {mailSender} = require("../../utils/mailSender");
+const {mailSender} = require("../../utils/mailSender.js");
 const Student = require("../../models/Student");
 const Staff = require("../../models/Staff");
 
