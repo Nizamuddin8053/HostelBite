@@ -39,32 +39,38 @@
 
 // using resend to send email(go to resend website get a api key)  npm i resend
 
-import nodemailer from "nodemailer";
-
-const transporter = nodemailer.createTransport({
-  host: "smtp-relay.brevo.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.BREVO_USER,
-    pass: process.env.BREVO_PASS,
-  },
-});
+import axios from "axios";
 
 export const mailSender = async (title, email, body) => {
   try {
-    const info = await transporter.sendMail({
-      from: `"HostelBite" <${process.env.BREVO_USER}>`,
-      to: email,
-      subject: title,
-      html: body,
-    });
+    const response = await axios.post(
+      "https://api.brevo.com/v3/smtp/email",
+      {
+        sender: {
+          name: "HostelBite",
+          email: "khannizamuddinkhan078@gmail.com", // verified sender
+        },
+        to: [
+          {
+            email: email,
+          },
+        ],
+        subject: title,
+        htmlContent: body,
+      },
+      {
+        headers: {
+          "api-key": process.env.BREVO_API_KEY,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-    console.log(" Email sent:", info.messageId);
-    return info;
+    console.log(" Email sent:", response.data);
+    return response.data;
 
   } catch (error) {
-    console.log("Email error:", error);
+    console.log(" Email error:", error.response?.data || error.message);
     throw error;
   }
 };
