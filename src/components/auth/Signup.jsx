@@ -44,12 +44,14 @@ const SignupForm = () => {
 
     const { email, otp } = formData;
     const handleSendOtp = async () => {
+        setLoading(true);
         try {
             await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/send-otp`, {
                 email,
             });
 
             setOtpSent(true);
+            setLoading(false);
 
             showToast("otp sent to your email",TOAST_TYPE.SUCCESS);
 
@@ -59,14 +61,13 @@ const SignupForm = () => {
 
                 showToast(err.response.data.message, TOAST_TYPE.ERROR);
 
-               
-
             } else {
 
                 showToast("something went wrong", TOAST_TYPE.ERROR);
                 
 
             }
+            setLoading(false);
         }
     };
 
@@ -210,18 +211,22 @@ const SignupForm = () => {
                                     className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                                 />
 
-                                {!otpSent && (
-                                    <span
-                                        style={{ marginLeft: "10px", color: "blue", cursor: "pointer" }}
+                                {!otpSent && !loading && (
+                                    <span 
+                                       className="ml-[10px] text-blue-600 cursor-pointer"
                                         onClick={handleSendOtp}
                                     >
                                         Send
                                     </span>
                                 )}
 
+                                {
+                                    otpSent && loading && <span className="ml-[10px]"><Spinner/></span>
+                                }
+
                                 {otpSent && !verified && (
                                     <span
-                                        style={{ marginLeft: "10px", color: "green", cursor: "pointer" }}
+                                        className="ml-[10px] text-green-400 cursor-pointer"
                                         onClick={handleVerifyOtp}
                                     >
                                         Verify
