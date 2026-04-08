@@ -2,6 +2,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { toast,Bounce } from "react-toastify";
+import Spinner from "../common/Spinner";
 
 const UpdatePassword = ()=>{
 
@@ -10,6 +11,8 @@ const UpdatePassword = ()=>{
     const [formData, setFormData] = useState({
         email: "",
     });
+
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (e)=>{
         setFormData(
@@ -24,6 +27,7 @@ const UpdatePassword = ()=>{
 
     const handleSubmit = async (e)=>{
         e.preventDefault();
+
 
         if(!formData.email){
             toast.error("enter your email", {
@@ -41,6 +45,8 @@ const UpdatePassword = ()=>{
 
         }
 
+        setLoading(true);
+
         try{
             await axios.put(`${process.env.REACT_APP_API_URL}/api/auth/forgot-password`,{
                 email: formData.email,
@@ -57,6 +63,7 @@ const UpdatePassword = ()=>{
                         theme: "light",
                         transition: Bounce,
             });
+            setLoading(false);
 
             navigate("/login"); 
         }catch(error){
@@ -72,9 +79,8 @@ const UpdatePassword = ()=>{
                             theme: "light",
                             transition: Bounce,
             });
+            setLoading(false);
             navigate("/signup");
-
-            
 
         }
     }
@@ -87,7 +93,9 @@ const UpdatePassword = ()=>{
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
-            <form
+            {
+                loading ? <Spinner/>: 
+                <form
                 onSubmit={handleSubmit}
                 className="bg-white shadow-xl rounded-2xl p-8 w-full max-w-md space-y-5"
             >
@@ -116,7 +124,8 @@ const UpdatePassword = ()=>{
                     Update Password
                 </button>
 
-            </form>    
+            </form>
+            }    
 
 
         </div>

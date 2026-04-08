@@ -21,7 +21,7 @@ exports.sendOtp = async (req, res) => {
     const existingStaff = await Staff.findOne({ email });
     const existingAdmin = await Admin.findOne({ email });
 
-    console.log(existingStudent, existingStaff, existingAdmin);
+    // console.log(existingStudent, existingStaff, existingAdmin);
 
     if (existingStudent || existingStaff || existingAdmin) {
       return res.status(409).json({
@@ -61,7 +61,10 @@ exports.sendOtp = async (req, res) => {
       htmlBody
     )
 
-    res.json({ message: "OTP sent successfully" });
+    res.json({
+      message: "OTP sent successfully",
+      hashedOtp
+    });
 
   } catch (error) {
     console.log("error while sending mail:", error);
@@ -75,45 +78,54 @@ exports.sendOtp = async (req, res) => {
 
 
 exports.verifyOtp = async (req, res) => {
-  const  { email, otp } = req.body;
 
-  
 
-  const record = await OTP.findOne({ email });
+  try {
 
-  // Check if record exists
-  if (!record) {
-    return res.status(400).json({ message: "OTP expired or not found" });
-  }
 
-  // expiry check
-  if (record.expiresAt < new Date()) {
+    const { email, otp } = req.body;
+
+    const record = await OTP.findOne({ email });
+
+    // Check if record exists
+    if (!record) {
+      return res.status(400).json({ message: "OTP expired or not found" });
+    }
+
+    // expiry check
+    if (record.expiresAt < new Date()) {
+      await OTP.deleteMany({ email });
+      return res.status(400).json({ message: "OTP expired" });
+    }
+
+    // too many attempts 
+    if (record.attempts >= 5) {
+      await OTP.deleteMany({ email });
+      return res.status(400).json({ message: "Too many attempts. Try again later." });
+    }
+
+    //  otp validation
+    const isMatch = await bcrypt.compare(otp, record.otp);
+
+    if (!isMatch) {
+      record.attempts += 1;
+      await record.save();
+
+      return res.status(400).json({
+        message: `Invalid OTP. Attempts left: ${5 - record.attempts}`,
+      });
+    }
+
+    //  success
     await OTP.deleteMany({ email });
-    return res.status(400).json({ message: "OTP expired" });
+
+    return res.status(200).json({ message: "OTP verified successfully" });
+  }catch(error){
+    return res.status(500).json({
+      message:"error while verifying otp"
+    })
+
   }
-
-  // too many attempts 
-  if (record.attempts >= 5) {
-    await OTP.deleteMany({ email });
-    return res.status(400).json({ message: "Too many attempts. Try again later." });
-  }
-
-  //  otp validation
-  const isMatch = await bcrypt.compare(otp, record.otp);
-
-  if (!isMatch) {
-    record.attempts += 1;
-    await record.save();
-
-    return res.status(400).json({
-      message: `Invalid OTP. Attempts left: ${5 - record.attempts}`,
-    });
-  }
-
-  //  success
-  await OTP.deleteMany({ email });
-
-  return res.status(200).json({ message: "OTP verified successfully" });
 
 };
 
@@ -122,20 +134,22 @@ exports.verifyOtp = async (req, res) => {
 
 exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
-  
-
-  const existingStudent = await Student.findOne({ email });
-  const existingStaff = await Staff.findOne({ email });
-  const existingAdmin = await Admin.findOne({ email });
 
 
-  
+  const existingStudent = await Student.findOne({ email, approved: true });
+  const existingStaff = await Staff.findOne({ email, approved:true });
+  const existingAdmin = await Admin.findOne({ email});
+
+
+
 
   if (!existingStudent && !existingStaff && !existingAdmin) {
     return res.status(400).json({
       message: "User not found",
     })
   }
+
+ 
 
   try {
     const password = otpGenerator.generate(8, {

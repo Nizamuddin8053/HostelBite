@@ -4,9 +4,9 @@ const Student = require("../../models/Student");
 exports.getAllStudents = async (req, res) => {
   try {
     const students = await Student.find(
-      {},
+      {approved: true},
       "name email course year roomNumber"
-    );
+    ).sort({createdAt: -1});
 
     res.status(200).json(students);
   } catch (err) {
@@ -64,7 +64,7 @@ exports.deleteStudent = async (req, res) => {
   try {
     const { student_id } = req.params;
 
-    const deleted = await Student.findByIdAndDelete(student_id);
+    const deleted = await Student.findByIdAndDelete({student_id});
 
     if (!deleted) {
       return res.status(404).json({ message: "Student not found" });

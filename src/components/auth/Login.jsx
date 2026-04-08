@@ -4,7 +4,8 @@ import { useNavigate } from "react-router-dom";
 import Spinner from "../common/Spinner";
 import { EyeOff, Eye } from "lucide-react";
 import showToast from "../../utils/showToast";
-import { TOAST_TYPE } from "../../utils/constants";
+import { ACCOUNT_TYPE, TOAST_TYPE } from "../../utils/constants";
+
 
 
 // login form 
@@ -17,6 +18,7 @@ const LoginForm = () => {
     const [showPassword, setShowPassword] = useState(false);
 
 
+
     const [formData, setFormData] = useState({
         email: "",
         password: "",
@@ -24,19 +26,10 @@ const LoginForm = () => {
     });
 
 
-    // check staff is approved or not
-    const checkApprove = async () => {
-        try {
-            const res = await axios.post(
-                `${process.env.REACT_APP_API_URL}/api/staff/checkapprove`,
-                { email: formData.email }
-            );
+    //  Email validation regex
+    const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-            return res.data.message; // true or false
-        } catch (error) {
-            return false;
-        }
-    };
+
 
 
 
@@ -52,29 +45,64 @@ const LoginForm = () => {
 
     }
 
+
+    const getUser = async () => {
+        try {
+            const res = await axios.post(
+                `${process.env.REACT_APP_API_URL}/api/common/getUser`,
+                {
+                    email: formData.email,
+                    role: formData.role,
+                    password: formData.password,
+                }
+            );
+            return res.data;
+        } catch (error) {
+            throw error;
+        }
+    };
+
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+
+        // email validation
+
+        if(!isValidEmail(formData.email)){
+            showToast("Enter a valid email address", TOAST_TYPE.ERROR);
+            setLoading(false);
+            return;
+        }
+
 
         setLoading(true);
 
         try {
+            const userData = await getUser();
 
+            if (!userData) {
+                showToast("User not found", TOAST_TYPE.ERROR);
+                setLoading(false);
+                return;
+            }
 
-
-            if (formData.role === "staff") {
-                const isApproved = await checkApprove();
-
-                if (!isApproved) {
-
-                    showToast("Admin will approve you soon!", TOAST_TYPE.INFO);
-                    
+            //  Approval check
+            if (
+                formData.role === ACCOUNT_TYPE.STAFF ||
+                formData.role === ACCOUNT_TYPE.STUDENT
+            ) {
+                if (!userData.approved) {
+                    showToast(
+                        "Admin will approve you soon. You’ll receive an email notification.",
+                        TOAST_TYPE.INFO
+                    );
                     setLoading(false);
-                    return; // ⛔ STOP LOGIN
+                    return;
                 }
             }
 
-
-
+            //  Login API
             const response = await axios.post(
                 `${process.env.REACT_APP_API_URL}/api/auth/login`,
                 {
@@ -89,14 +117,11 @@ const LoginForm = () => {
                 }
             );
 
-
-
             localStorage.setItem("token", response.data.token);
 
-            showToast("login successfull!", TOAST_TYPE.SUCCESS);
+            showToast("Login successful!", TOAST_TYPE.SUCCESS);
 
-        
-            // navigate to respective dashboard based on role
+            // Redirect
             if (response.data.role === "student") {
                 navigate("/student-dashboard");
             } else if (response.data.role === "admin") {
@@ -108,17 +133,18 @@ const LoginForm = () => {
             }
 
         } catch (error) {
+            console.error("Login error:", error.response?.data || error.message);
 
-            console.error(" Login error:", error.response?.data || error.message);
-
-            showToast(error.response?.data?.message || "login failed!", TOAST_TYPE.ERROR);
-            
-
+            showToast(
+                error.response?.data?.message || "Login failed!",
+                TOAST_TYPE.ERROR
+            );
         } finally {
             setLoading(false);
-
         }
     };
+
+
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">

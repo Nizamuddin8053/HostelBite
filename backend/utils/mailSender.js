@@ -37,7 +37,7 @@
 
 
 
-// using resend to send email(go to resend website get a api key)  npm i resend
+// BREVO API USED TO SEND EMAIL BECAUSE SMTP BLOCKED BY RENDER EVERY TIME
 
 import axios from "axios";
 

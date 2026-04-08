@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import {ACCOUNT_TYPE} from "../../../../utils/constants";
+
 
 const ApproveStaff = () => {
   const [staffList, setStaffList] = useState([]);
@@ -9,7 +11,10 @@ const ApproveStaff = () => {
   const fetchStaff = async () => {
     try {
       const res = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/staff/unapproved`
+        `${process.env.REACT_APP_API_URL}/api/userApprove/unapproved`,
+
+          ACCOUNT_TYPE.STAFF
+        
       );
 
       console.log("staff data :", res);
@@ -30,7 +35,9 @@ const ApproveStaff = () => {
       setLoading(true);
 
       await axios.put(
-        `${process.env.REACT_APP_API_URL}/api/staff/approve/${id}`
+        `${process.env.REACT_APP_API_URL}/api/uerApprove/approve/${id}`,
+
+        ACCOUNT_TYPE.STAFF
       );
 
       // Remove approved staff from UI instantly

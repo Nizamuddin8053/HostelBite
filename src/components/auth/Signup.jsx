@@ -43,12 +43,15 @@ const SignupForm = () => {
     const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
     const { email, otp } = formData;
+
     const handleSendOtp = async () => {
         setLoading(true);
         try {
-            await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/send-otp`, {
+            const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/send-otp`, {
                 email,
             });
+
+            console.log(res);
 
             setOtpSent(true);
             setLoading(false);
@@ -77,6 +80,7 @@ const SignupForm = () => {
             if (!otp) {
 
                 showToast("Please enter your otp", TOAST_TYPE.ERROR)
+                setLoading(false);
 
                 return;
             }
@@ -88,7 +92,8 @@ const SignupForm = () => {
             setLoading(false);
             setVerified(true);
         } catch (err) {
-            console.log(err);
+            showToast("please, enter valid otp", TOAST_TYPE.ERROR);
+            setLoading(false);
         }
     };
 
@@ -200,7 +205,7 @@ const SignupForm = () => {
 
                         <div className="flex flex-col">
                             <label className="block mb-1 text-gray-600 font-medium">Email</label>
-                            <div className="flex flex-row gap-3">
+                            <div className="flex flex-row gap-3 cursor-pointer">
                                 <input
                                     type="email"
                                     required
@@ -213,7 +218,7 @@ const SignupForm = () => {
 
                                 {!otpSent && !loading && (
                                     <span 
-                                       className="ml-[10px] text-blue-600 cursor-pointer"
+                                       className="ml-[10px] text-blue-600 "
                                         onClick={handleSendOtp}
                                     >
                                         Send
@@ -226,7 +231,7 @@ const SignupForm = () => {
 
                                 {otpSent && !verified && (
                                     <span
-                                        className="ml-[10px] text-green-400 cursor-pointer"
+                                        className="ml-[10px] text-green-700"
                                         onClick={handleVerifyOtp}
                                     >
                                         Verify
@@ -363,7 +368,7 @@ const SignupForm = () => {
                                 <option value="">Select role</option>
                                 <option value="student">Student</option>
                                 <option value="staff">Staff</option>
-                                <option value="admin">Admin</option>
+                                
                             </select>
                         </div>
 

@@ -1,6 +1,6 @@
 const WeeklyMenu = require("../../models/Menu");
-const {sendEmailMessage} = require("../../mailTemplates/commonMailTemplate");
-const {mailSender} = require("../../utils/mailSender.js");
+const { sendEmailMessage } = require("../../mailTemplates/commonMailTemplate");
+const { mailSender } = require("../../utils/mailSender.js");
 const Student = require("../../models/Student");
 const Staff = require("../../models/Staff");
 
@@ -147,13 +147,13 @@ exports.updateMenu = async (req, res) => {
 
     // send email to all students and all staff(updation notification)
 
-    const students = await Student.find().select("email");
-    const staffs = await Staff.find().select("email");
+    const students = await Student.find({ approved: true }).select("email");
+    const staffs = await Staff.find({ approved: true }).select("email");
 
     // extract emails
 
-    const studentEmails = students.map((s)=> s.email);
-    const staffEmails = staffs.map((st)=> st.email);
+    const studentEmails = students.map((s) => s.email);
+    const staffEmails = staffs.map((st) => st.email);
 
     // merge all mails
 
@@ -161,12 +161,12 @@ exports.updateMenu = async (req, res) => {
 
     // unique emails
 
-    const uniqueEmails = [...new  Set(allEmails)];
+    const uniqueEmails = [...new Set(allEmails)];
 
 
     const htmlBody = sendEmailMessage({
       title: "Menu updated",
-      message:"your mess menu is updated on the basis of reviews and feedbacks",
+      message: "your mess menu is updated on the basis of reviews and feedbacks",
       highlightText: `${process.env.FRONTEND_URL}/api/menu/latest-menu`
     })
 
@@ -174,21 +174,16 @@ exports.updateMenu = async (req, res) => {
     // send emails 
 
     for (const email of uniqueEmails) {
-  try {
-    await mailSender(
-      "Menu update from HostelBite",
-      email,
-      htmlBody
-    );
-  } catch (err) {
-    console.log("Failed for:", email);
-  }
-}
-
-
-
-
-    
+      try {
+        await mailSender(
+          "Menu update from HostelBite",
+          email,
+          htmlBody
+        );
+      } catch (err) {
+        console.log("Failed for:", email);
+      }
+    }
 
 
 
