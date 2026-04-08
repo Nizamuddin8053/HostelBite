@@ -21,20 +21,16 @@ const paymentRoutes = require("./routes/paymentRoutes");
 // const qrRoutes = require("./routes/qrRoutes");
 
 
-
-
-
-
-
 require("dotenv").config();
 
 const app = express();
-app.use(
-  cors({
-    origin: [process.env.FRONTEND_URL],
-    credentials: true
-  })
-);
+app.use(cors({
+  origin: "https://hostelbite-project.vercel.app",
+  credentials: true
+}));
+
+app.options("*", cors());
+
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
