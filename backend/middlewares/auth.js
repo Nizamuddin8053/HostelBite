@@ -14,7 +14,13 @@ exports.auth = (req, res, next) => {
         // we need to body-parser to Fetch token From body
 
 
-        const token = req.cookies.token || req.body.token || req.header("Authorization").replace("bearer ", "");
+        const authHeader = req.header("Authorization");
+        const token = 
+        req.cookies?.token || 
+        req.body?.token || 
+        (authHeader ? authHeader.replace(/^Bearer\s+/i, "") : null);
+
+        
         if (!token) {
             return res.status(401).json({
                 success: false,
@@ -28,7 +34,7 @@ exports.auth = (req, res, next) => {
 
             const payload = jwt.verify(token, process.env.JWT_SECRET);
             console.log(payload);
-            // adding user to req and assining user:payload
+            // adding user to req and assgining user:payload
             req.user = payload; // this payload containing role we will use it in isStudent, isAdmin
 
         } catch (error) {

@@ -98,7 +98,7 @@ const SignupForm = () => {
     };
 
 
-    //  Password strength checker
+    //  Password strength checker(regex)
     const isStrongPassword = (password) =>
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/.test(password);
 
@@ -368,6 +368,7 @@ const SignupForm = () => {
                                 <option value="">Select role</option>
                                 <option value="student">Student</option>
                                 <option value="staff">Staff</option>
+                                <option value="admin">Admin</option>
                                 
                             </select>
                         </div>

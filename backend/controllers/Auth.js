@@ -129,6 +129,9 @@ exports.login = async (req, res) => {
   try {
     const { email, password, role } = req.body;
 
+    
+
+
     if (!email || !password || !role) {
       return res.status(400).json({
         message: "Email, password and role required",
@@ -158,7 +161,7 @@ exports.login = async (req, res) => {
     }
 
     // Compare password
-    const isMatch =  bcrypt.compare(password, user.password);
+    const isMatch =  await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
@@ -171,10 +174,12 @@ exports.login = async (req, res) => {
       { expiresIn: "1h" }
     );
 
+    console.log("token is: ", token);
+
     res.status(200).json({
       message: "Login successful",
-      role,    // no need to send separately these details in res because I have encoded 
-      token,   // these details using jwt.sign() whenever I will need I can decode all details using token
+      role,    
+      token,   
       fullName: user.name,    // best practice to send in user:{role, token, fullName} object 
     });
 

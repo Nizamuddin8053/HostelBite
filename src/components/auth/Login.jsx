@@ -82,25 +82,25 @@ const LoginForm = () => {
             const userData = await getUser();
 
             if (!userData) {
-                showToast("User not found", TOAST_TYPE.ERROR);
+                showToast("Invalid credentials", TOAST_TYPE.ERROR);
                 setLoading(false);
                 return;
             }
 
             //  Approval check
-            if (
-                formData.role === ACCOUNT_TYPE.STAFF ||
-                formData.role === ACCOUNT_TYPE.STUDENT
-            ) {
-                if (!userData.approved) {
-                    showToast(
-                        "Admin will approve you soon. You’ll receive an email notification.",
-                        TOAST_TYPE.INFO
-                    );
-                    setLoading(false);
-                    return;
-                }
-            }
+            // if (
+            //     formData.role === ACCOUNT_TYPE.STAFF ||
+            //     formData.role === ACCOUNT_TYPE.STUDENT
+            // ) {
+            //     if (!userData.approved) {
+            //         showToast(
+            //             "Admin will approve you soon. You’ll receive an email notification.",
+            //             TOAST_TYPE.INFO
+            //         );
+            //         setLoading(false);
+            //         return;
+            //     }
+            // }
 
             //  Login API
             const response = await axios.post(
