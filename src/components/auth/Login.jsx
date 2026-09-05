@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Spinner from "../common/Spinner";
 import { EyeOff, Eye } from "lucide-react";
 import showToast from "../../utils/showToast";
-import { ACCOUNT_TYPE, TOAST_TYPE } from "../../utils/constants";
+import {TOAST_TYPE } from "../../utils/constants";
 
 
 
