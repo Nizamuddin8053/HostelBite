@@ -1,5 +1,6 @@
 const Staff = require("../../models/Staff");
 const Student = require("../../models/Student");
+const { sendEmailMessage } = require("../../mailTemplates/commonMailTemplate");
 const { mailSender } = require("../../utils/mailSender.js");
 
 
@@ -44,27 +45,25 @@ exports.checkApprove = async (req, res) => {
 exports.getUnapprovedUser = async (req, res) => {
     try {
 
-        const { role } = req.body;
+        const { role } = req.query;
 
-        let user;
-
+        let users;
         if (role === "staff") {
-            user = await Staff.find({ approved: false })
-                .sort({ createdAt: -1 }) // latest first
-                .select("-password"); //  do not select password
-
-        } else if (role === "student") {
-            user = await Student.find({ approved: false })
+            users = await Staff.find({ approved: false })
                 .sort({ createdAt: -1 })
                 .select("-password");
+        } else if (role === "student") {
+            users = await Student.find({ approved: false })
+                .sort({ createdAt: -1 })
+                .select("-password");
+        } else {
+            return res.status(400).json({ success: false, message: "Role must be staff or student" });
         }
-
-
 
         res.status(200).json({
             success: true,
-            count: user.length,
-            data: user,
+            count: users.length,
+            data: users,
         });
 
     } catch (err) {
@@ -84,24 +83,24 @@ exports.approveUser = async (req, res) => {
     try {
         const { id } = req.params;
         const { role } = req.body;
-
+        if (!["staff", "student"].includes(role)) {
+            return res.status(400).json({ message: "Role must be staff or student" });
+        }
 
         let user;
-
-
         if (role === "staff") {
             user = await Staff.findByIdAndUpdate(
                 id,
                 { approved: true },
-                { new: true }
-            );
+                { new: true, runValidators: true }
+            ).select("-password");
 
-        }else if(role=== "student"){
+        } else {
             user = await Student.findByIdAndUpdate(
                 id,
-                {approved: true},
-                {new: true}
-            )
+                { approved: true },
+                { new: true, runValidators: true }
+            ).select("-password");
         }
 
 
@@ -124,14 +123,23 @@ exports.approveUser = async (req, res) => {
             footerNote: "If you have any questions, feel free to contact the HostelBite team."
         });
 
-        await mailSender(
-            "Your HostelBite Account Has Been Approved",
-            user.email,
-            htmlBody
-        );
+        let notificationSent = true;
+        try {
+            await mailSender(
+                "Your HostelBite Account Has Been Approved",
+                user.email,
+                htmlBody
+            );
+        } catch (emailError) {
+            notificationSent = false;
+            console.error("Account approved, but notification email failed:", emailError);
+        }
 
         res.status(200).json({
-            message: "user approved successfully",
+            message: notificationSent
+                ? "User approved successfully"
+                : "User approved, but the notification email could not be sent",
+            notificationSent,
             user,
         });
     } catch (err) {

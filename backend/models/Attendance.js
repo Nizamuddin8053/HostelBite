@@ -6,28 +6,30 @@ const attendanceSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
+    mealType: {
+      type: String,
+      enum: ["breakfast", "lunch", "snacks", "dinner"],
+      required: true,
+    },
     status: {
       type: String,
       enum: ["present", "absent"],
+      default: "present",
       required: true,
     },
     menuId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Menu",
+      ref: "WeeklyMenu",
+    },
+    student_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Student",
       required: true,
     },
     email_student: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Student",
-      required: true,
-    },
-    email_staff : {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Staff",
-    },
-    email_admin: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Management",
+      select: false,
     },
   },
   {

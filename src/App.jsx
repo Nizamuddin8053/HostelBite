@@ -85,6 +85,7 @@ import ViewInvoices from "./components/student/studentFunctions/ViewInvoices";
 //  ***********************************************************there are 6 cards**************************************************
 
 import ManageFeedbackAttendance from "./components/management/ManageFeedbackAttendance";
+import QRDisplay from "./components/management/QRDisplay";
 import ManageMenuExpenses from "./components/management/ManageMenuExpenses";
 import ManagePaymentInvoice from "./components/management/ManagePaymentInvoice";
 import ManageStaffSalary from "./components/management/ManageStaffSalary";
@@ -235,6 +236,11 @@ function App() {
           <Route path="/latest-menu" element={
             <PrivateRoute allowedRoles={[ACCOUNT_TYPE.ADMIN, ACCOUNT_TYPE.STAFF, ACCOUNT_TYPE.STUDENT]}>
               <ViewMenu />
+            </PrivateRoute>
+          } />
+          <Route path="/get-attendance-qr" element={
+            <PrivateRoute allowedRoles={[ACCOUNT_TYPE.ADMIN]}>
+              <QRDisplay />
             </PrivateRoute>
           } />
           <Route path="/userNotification"
@@ -474,6 +480,12 @@ function App() {
             element={
               <PrivateRoute allowedRoles={[ACCOUNT_TYPE.ADMIN]}>
                 <ApproveStaff />
+              </PrivateRoute>
+            } />
+          <Route path="/approve-students"
+            element={
+              <PrivateRoute allowedRoles={[ACCOUNT_TYPE.ADMIN]}>
+                <ApproveStaff role="student" />
               </PrivateRoute>
             } />
 

@@ -20,6 +20,7 @@ const staffRoutes = require("./routes/staffRoute");
 const paymentRoutes = require("./routes/paymentRoutes");
 const userApproveRoutes = require("./routes/approveUserRoutes");
 const commonRoutes = require("./routes/commonRoutes");
+const { auth } = require("./middlewares/auth");
 
 // const qrRoutes = require("./routes/qrRoutes");
 
@@ -37,6 +38,7 @@ app.use(cors({
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
+app.use("/api", auth);
 app.use("/api/students", studentRoutes);
 app.use("/api/attendance", attendanceRoutes);
 app.use("/api/complaints", complaintRoutes);
@@ -62,10 +64,18 @@ app.get("/", (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 
-// Mongo db connection
-connectDB();
-// server is running or not 
+const startServer = async () => {
+  await connectDB();
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+};
 
-app.listen(PORT, ()=>{
-  console.log(`server is running on ${PORT}`);
-})
+if (require.main === module) {
+  startServer().catch((error) => {
+    console.error("Server startup failed:", error);
+    process.exitCode = 1;
+  });
+}
+
+module.exports = app;

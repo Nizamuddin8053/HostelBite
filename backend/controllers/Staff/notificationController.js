@@ -22,7 +22,7 @@ exports.createNotification = async (req, res) => {
         });
       }
 
-      const student = await Student.findById({student_id});
+      const student = await Student.findById(student_id);
       if(!student){
         return res.status(409).json({
           message: "user not found"
@@ -44,7 +44,7 @@ exports.createNotification = async (req, res) => {
         });
       }
 
-      const students = await Student.find({ course, year }, "_id");
+      const students = await Student.find({ course, year, approved: true }, "_id");
 
       notifications = students.map((student) => ({
         student_id: student._id,
@@ -55,7 +55,7 @@ exports.createNotification = async (req, res) => {
 
     // All students
     else if (targetType === "all") {
-      const students = await Student.find({}, "_id");
+      const students = await Student.find({ approved: true }, "_id");
 
       notifications = students.map((student) => ({
         student_id: student._id,
@@ -105,7 +105,7 @@ exports.getNotificationsByUser = async (req, res) => {
 
     if (role === "student") query.student_id = userId;
     else if (role === "staff") query.staff_id = userId;
-    else if (role === "management") query.management_id = userId;
+    else if (role === "admin") query.management_id = userId;
     else {
       return res.status(400).json({ error: "Invalid role type" });
     }
@@ -128,8 +128,8 @@ exports.markAsRead = async (req, res) => {
     const { id } = req.params;
 
     const updated = await Notification.findOneAndUpdate(
-      id,
-      { isRead: true },
+      { _id: id, student_id: req.user.id },
+      { $set: { isRead: true } },
       { new: true }
     );
 

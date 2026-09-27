@@ -1,19 +1,38 @@
 const Management = require("../../models/Management");
+const Student = require("../../models/Student");
+const Staff = require("../../models/Staff");
 const bcrypt = require("bcrypt");
+const { emailFilter } = require("../../utils/emailFilter");
 
 
 exports.createManagement = async (req, res) => {
   try {
     const { name, email, password } = req.body;
+    const normalizedEmail = typeof email === "string" ? email.trim().toLowerCase() : "";
 
-    if (!name || !email || !password) {
+    if (
+      typeof name !== "string" ||
+      !name.trim() ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail) ||
+      !password
+    ) {
       return res.status(400).json({ error: "Name, email, and password are required" });
     }
+    if (
+      typeof password !== "string" ||
+      password.length < 8 ||
+      Buffer.byteLength(password, "utf8") > 72
+    ) {
+      return res.status(400).json({ error: "Password must be 8 or more characters and no more than 72 UTF-8 bytes" });
+    }
 
-    // Check duplicate email
-    const existing = await Management.findOne({ email });
-    if (existing) {
-      return res.status(400).json({ error: "Email already exists" });
+    const [existingManagement, existingStudent, existingStaff] = await Promise.all([
+      Management.findOne(emailFilter(normalizedEmail)),
+      Student.findOne(emailFilter(normalizedEmail)),
+      Staff.findOne(emailFilter(normalizedEmail)),
+    ]);
+    if (existingManagement || existingStudent || existingStaff) {
+      return res.status(409).json({ error: "Email already exists" });
     }
 
 
@@ -22,8 +41,8 @@ exports.createManagement = async (req, res) => {
 
 
     const newManagement = await Management.create({
-      name,
-      email,
+      name: name.trim(),
+      email: normalizedEmail,
       password: hashedPassword
     });
 
@@ -43,6 +62,7 @@ exports.getAllManagement = async (req, res) => {
   try {
     const managementList = await Management
       .find()
+      .select("-password")
       .sort({ createdAt: -1 });
 
     res.status(200).json(managementList);
@@ -56,7 +76,7 @@ exports.getAllManagement = async (req, res) => {
 
 exports.getManagementById = async (req, res) => {
   try {
-    const management = await Management.findById(req.params.id);
+    const management = await Management.findById(req.params.id).select("-password");
 
     if (!management) {
       return res.status(404).json({ error: "Management record not found" });
@@ -74,14 +94,43 @@ exports.getManagementById = async (req, res) => {
 exports.updateManagement = async (req, res) => {
   try {
     const { name, email, password } = req.body;
+    const updates = {};
+    if (typeof name === "string" && name.trim()) updates.name = name.trim();
+    if (typeof email === "string" && email.trim()) {
+      const normalizedEmail = email.trim().toLowerCase();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+        return res.status(400).json({ error: "Enter a valid email address" });
+      }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+      const [existingManagement, existingStudent, existingStaff] = await Promise.all([
+        Management.findOne({ ...emailFilter(normalizedEmail), _id: { $ne: req.params.id } }),
+        Student.findOne(emailFilter(normalizedEmail)),
+        Staff.findOne(emailFilter(normalizedEmail)),
+      ]);
+      if (existingManagement || existingStudent || existingStaff) {
+        return res.status(409).json({ error: "Email already exists" });
+      }
+      updates.email = normalizedEmail;
+    }
+    if (password !== undefined) {
+      if (
+        typeof password !== "string" ||
+        password.length < 8 ||
+        Buffer.byteLength(password, "utf8") > 72
+      ) {
+        return res.status(400).json({ error: "Password must be 8 or more characters and no more than 72 UTF-8 bytes" });
+      }
+      updates.password = await bcrypt.hash(password, 10);
+    }
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ error: "Provide at least one valid field to update" });
+    }
 
     const updated = await Management.findByIdAndUpdate(
       req.params.id,
-      { name, email, password: hashedPassword },
-      { new: true }
-    );
+      { $set: updates },
+      { new: true, runValidators: true }
+    ).select("-password");
 
     if (!updated) {
       return res.status(404).json({ error: "Management record not found" });

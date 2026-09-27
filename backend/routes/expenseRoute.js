@@ -9,16 +9,17 @@ const {
 
 
 const router = express.Router();
+const { isAdmin } = require("../middlewares/auth");
 
 // Add new expense
-router.post("/create-expense", createExpense);
+router.post("/create-expense", isAdmin, createExpense);
 
 // Get all expenses
-router.get("/viewAllExpenses", getAllExpenses);
+router.get("/viewAllExpenses", isAdmin, getAllExpenses);
 
 // get category+monthly expense
 
-router.get("/viewCategoryWiseMonthlyExpenses", getMonthlyCategoryExpenses);
+router.get("/viewCategoryWiseMonthlyExpenses", isAdmin, getMonthlyCategoryExpenses);
 
 
 module.exports = router;

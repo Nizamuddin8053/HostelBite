@@ -1,4 +1,8 @@
 const Staff = require("../../models/Staff");
+const Student = require("../../models/Student");
+const Management = require("../../models/Management");
+const bcrypt = require("bcrypt");
+const { emailFilter } = require("../../utils/emailFilter");
 const { sendEmailMessage } = require("../../mailTemplates/commonMailTemplate");
 const { mailSender } = require("../../utils/mailSender.js");
 
@@ -7,25 +11,45 @@ const { mailSender } = require("../../utils/mailSender.js");
 exports.createStaff = async (req, res) => {
   try {
     const { name, role, email, password, salary } = req.body;
+    const normalizedEmail = typeof email === "string" ? email.trim().toLowerCase() : "";
 
-    if (!name || !role || !email || !password) {
+    if (
+      typeof name !== "string" ||
+      !name.trim() ||
+      typeof role !== "string" ||
+      !role.trim() ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail) ||
+      !password
+    ) {
       return res.status(400).json({
         error: "Name, role , email and password are required",
       });
     }
-
-    //  Check duplicate email
-    const existingStaff = await Staff.findOne({ email });
-    if (existingStaff) {
-      return res.status(400).json({ error: "Staff already exists" });
+    if (
+      typeof password !== "string" ||
+      password.length < 8 ||
+      Buffer.byteLength(password, "utf8") > 72
+    ) {
+      return res.status(400).json({ error: "Password must be 8 or more characters and no more than 72 UTF-8 bytes" });
     }
 
+    const [existingStaff, existingStudent, existingManagement] = await Promise.all([
+      Staff.findOne(emailFilter(normalizedEmail)),
+      Student.findOne(emailFilter(normalizedEmail)),
+      Management.findOne(emailFilter(normalizedEmail)),
+    ]);
+    if (existingStaff || existingStudent || existingManagement) {
+      return res.status(409).json({ error: "Staff already exists" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
     const staff = await Staff.create({
-      name,
+      name: name.trim(),
       role,
-      email,
-      password,
+      email: normalizedEmail,
+      password: hashedPassword,
       salaryAmount: salary || 0,
+      approved: true,
     });
 
     res.status(201).json({
@@ -43,7 +67,9 @@ exports.createStaff = async (req, res) => {
 // Get all staff
 exports.getAllStaff = async (req, res) => {
   try {
-    const staff = await Staff.find({ approved: true }).sort({ createdAt: -1 });
+    const staff = await Staff.find({ approved: true })
+      .select("-password")
+      .sort({ createdAt: -1 });
 
     res.status(200).json(staff);
   } catch (err) {
@@ -148,5 +174,3 @@ exports.deleteStaff = async (req, res) => {
     res.status(500).json({ error: "Database error" });
   }
 };
-
-

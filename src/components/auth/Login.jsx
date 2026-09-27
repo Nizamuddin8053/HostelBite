@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Spinner from "../common/Spinner";
 import { EyeOff, Eye } from "lucide-react";
 import showToast from "../../utils/showToast";
@@ -13,6 +13,7 @@ const LoginForm = () => {
 
     // localStorage.clear();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
@@ -46,23 +47,6 @@ const LoginForm = () => {
     }
 
 
-    const getUser = async () => {
-        try {
-            const res = await axios.post(
-                `${process.env.REACT_APP_API_URL}/api/common/getUser`,
-                {
-                    email: formData.email,
-                    role: formData.role,
-                    password: formData.password,
-                }
-            );
-            return res.data;
-        } catch (error) {
-            throw error;
-        }
-    };
-
-
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -79,30 +63,6 @@ const LoginForm = () => {
         setLoading(true);
 
         try {
-            const userData = await getUser();
-
-            if (!userData) {
-                showToast("Invalid credentials", TOAST_TYPE.ERROR);
-                setLoading(false);
-                return;
-            }
-
-            //  Approval check
-            // if (
-            //     formData.role === ACCOUNT_TYPE.STAFF ||
-            //     formData.role === ACCOUNT_TYPE.STUDENT
-            // ) {
-            //     if (!userData.approved) {
-            //         showToast(
-            //             "Admin will approve you soon. You’ll receive an email notification.",
-            //             TOAST_TYPE.INFO
-            //         );
-            //         setLoading(false);
-            //         return;
-            //     }
-            // }
-
-            //  Login API
             const response = await axios.post(
                 `${process.env.REACT_APP_API_URL}/api/auth/login`,
                 {
@@ -121,8 +81,10 @@ const LoginForm = () => {
 
             showToast("Login successful!", TOAST_TYPE.SUCCESS);
 
-            // Redirect
-            if (response.data.role === "student") {
+            const requestedPath = location.state?.from;
+            if (requestedPath?.pathname?.startsWith("/") && !requestedPath.pathname.startsWith("//")) {
+                navigate(`${requestedPath.pathname}${requestedPath.search || ""}${requestedPath.hash || ""}`, { replace: true });
+            } else if (response.data.role === "student") {
                 navigate("/student-dashboard");
             } else if (response.data.role === "admin") {
                 navigate("/admin-dashboard");

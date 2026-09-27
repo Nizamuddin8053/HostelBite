@@ -16,14 +16,16 @@ HostelBite is a full-stack MERN web application designed to simplify hostel food
 ### 👨‍🎓 Student Features
 
 * User Signup & Login (JWT Authentication)
+* Account approval before students and staff can sign in
 * View Profile Details
 * Access Mess information
 * Secure API-based data fetching
+* QR-based meal attendance with duplicate prevention and attendance history
 
 ### 🛠️ Admin / Backend Features
 
 * RESTful API using Express.js
-* Authentication & Authorization
+* JWT authentication and role-based authorization for API routes
 * Student Data Management
 * MongoDB Database Integration
 
@@ -89,6 +91,8 @@ MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_secret_key
 ```
 
+Create the first administrator account through a trusted deployment/administration process. Public signup is limited to student and staff accounts; administrator accounts must not be created through the public registration form.
+
 ---
 
 ## 🛠️ Installation & Setup
@@ -138,11 +142,25 @@ This project uses **Jenkins** for automated deployment:
 
 * `POST /api/auth/signup`
 * `POST /api/auth/login`
+* `POST /api/auth/send-otp`
+* `POST /api/auth/verify-otp`
+* `PUT /api/auth/forgot-password`
 
-### Student Routes
+All endpoints outside `/api/auth` require `Authorization: Bearer <token>`. Student and staff accounts must be approved before login. Resource routes enforce roles; student-specific records are scoped to the authenticated student.
+Registration requires a verified email code before the account is created. Password recovery uses a separate, expiring code and a one-time reset token; passwords are never sent by email or returned by the API.
 
-* `GET /api/students`
-* `GET /api/students/:id`
+### Attendance
+
+* `POST /api/attendance/qr` — administrator creates a five-minute QR session with a meal type.
+* `POST /api/attendance/mark` — an authenticated, approved student records attendance using the QR token.
+* `GET /api/attendance/me` — student attendance history.
+* `GET /api/attendance` — staff and administrator attendance records.
+
+Students can scan the QR link using their phone camera after signing in. Attendance is derived from the authenticated account, and a unique database constraint prevents duplicate attendance for the same meal on a given UTC date. Expired QR session records are removed automatically by MongoDB's TTL index.
+
+### Other authenticated routes
+
+Students, staff, and administrators can access the relevant features at `/api/students`, `/api/complaints`, `/api/feedbacks`, `/api/menu`, `/api/payments`, `/api/invoice`, `/api/notification`, `/api/salary`, and `/api/expenses`; access is restricted according to role and record ownership.
 
 ---
 

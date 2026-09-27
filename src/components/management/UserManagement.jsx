@@ -15,6 +15,10 @@ const UserManagement = () => {
         navigate("/remove-staff");
     }
 
+    const approveStudentsHandler = () => {
+        navigate("/approve-students");
+    }
+
 
     return (
         <div className="bg-white p-5 rounded-2xl shadow-md">
@@ -34,6 +38,9 @@ const UserManagement = () => {
                 </button>
                 <button onClick={removeStaffHandler} className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
                     Remove Staff
+                </button>
+                <button onClick={approveStudentsHandler} className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                    Approve Students
                 </button>
             </div>
         </div>

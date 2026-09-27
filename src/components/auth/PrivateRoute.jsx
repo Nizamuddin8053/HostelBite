@@ -1,28 +1,31 @@
 import { jwtDecode } from "jwt-decode";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 
 function PrivateRoute({ children, allowedRoles= [] }) {
   const token = localStorage.getItem("token");
-   
+  const location = useLocation();
 
-  //  Not logged in
   if (!token) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
   try {
     const decoded = jwtDecode(token);
     const role = decoded.role;
 
-    // role not allowed
+    if (decoded.exp && decoded.exp * 1000 <= Date.now()) {
+      localStorage.removeItem("token");
+      return <Navigate to="/login" replace state={{ from: location }} />;
+    }
+
     if (!allowedRoles.includes(role)) {
       return <Navigate to="/unauthorized" />;
     }
 
-    // Allowed
     return children;
   } catch (error) {
-    return <Navigate to="/login" />;
+    localStorage.removeItem("token");
+    return <Navigate to="/login" replace state={{ from: location }} />;
   }
 }
 

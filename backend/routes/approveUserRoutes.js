@@ -7,16 +7,17 @@ const {
     approveUser
 
 } =  require("../controllers/Management/approveController");
+const { isAdmin } = require("../middlewares/auth");
 
 
 
 // unapprove staff
-router.get("/unapproved", getUnapprovedUser);
+router.get("/unapproved", isAdmin, getUnapprovedUser);
 
 // check user is approved or not 
-router.post("/checkapprove", checkApprove);
+router.post("/checkapprove", isAdmin, checkApprove);
 
 // approve staff
-router.put("/approve/:id", approveUser);
+router.put("/approve/:id", isAdmin, approveUser);
 
 module.exports = router;

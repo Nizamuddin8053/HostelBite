@@ -134,7 +134,7 @@ exports.getInvoicesByStudent = async (req, res) => {
             return res.status(400).json({ error: "Invalid student ID" });
         }
 
-        const invoices = await Invoice.find( student_id )
+        const invoices = await Invoice.find({ student_id })
             .sort({ createdAt: -1 });
 
         // Calculate total unpaid
@@ -207,4 +207,3 @@ exports.deleteInvoice = async (req, res) => {
         res.status(500).json({ error: "Database error" });
     }
 };
-

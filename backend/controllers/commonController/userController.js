@@ -1,21 +1,15 @@
 const Management = require("../../models/Management");
 const Student = require("../../models/Student");
 const Staff = require("../../models/Staff");
-const bcrypt = require("bcrypt");
-
-
-// Get staff by ID
 exports.getUserByEmail = async (req, res) => {
   try {
-    const { email, role, password } = req.body;
-
     let user;
-    if (role === "staff") {
-      user = await Staff.findOne({ email });
-    } else if (role === "student") {
-      user = await Student.findOne({ email });
-    } else if (role === "admin") {
-      user = await Management.findOne({ email });
+    if (req.user.role === "staff") {
+      user = await Staff.findById(req.user.id).select("-password");
+    } else if (req.user.role === "student") {
+      user = await Student.findById(req.user.id).select("-password");
+    } else if (req.user.role === "admin") {
+      user = await Management.findById(req.user.id).select("-password");
     }
 
     if (!user) {
@@ -24,19 +18,9 @@ exports.getUserByEmail = async (req, res) => {
       });
     }
 
-    const isMatched = await bcrypt.compare(password, user.password);
-
-    if (!isMatched) {
-      return res.status(401).json({
-        message: "Wrong password",
-      });
-    }
-
-    user.password = undefined;
-
     res.status(200).json(user);
   } catch (err) {
-    console.error("Error fetching user:", err);
+    console.error("Error fetching current user:", err);
     res.status(500).json({ error: "Internal server error" });
   }
 };

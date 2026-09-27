@@ -7,7 +7,7 @@ const {
 
 } = require("../controllers/commonController/userController");
 
-router.post("/getUser", getUserByEmail);
+router.get("/me", getUserByEmail);
 
 
 module.exports = router;

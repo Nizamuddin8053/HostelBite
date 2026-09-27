@@ -9,15 +9,15 @@ const { mailSender } = require("../../utils/mailSender");
 
 exports.createFeedback = async (req, res) => {
   try {
-    const { student_id, message, rating } = req.body;
+    const { message, rating } = req.body;
 
-    if (!student_id || !message) {
+    if (!message) {
       return res.status(400).json({
-        error: "Student ID and message are required"
+        error: "Message is required"
       });
     }
 
-    const student = await Student.findById(student_id);
+    const student = await Student.findById(req.user.id);
 
     if (!student) {
       return res.status(404).json({ error: "Student not found" });
@@ -27,7 +27,7 @@ exports.createFeedback = async (req, res) => {
       message,
       rating: rating || null,
       submittedAt: Date.now(),
-      student_id,
+      student_id: student._id,
 
     })
 
@@ -46,7 +46,7 @@ exports.createFeedback = async (req, res) => {
     )
 
     return res.status(201).json({
-      message: `feedback given by ${student_id}`,
+      message: "Feedback submitted successfully",
     })
 
   } catch (error) {
@@ -59,19 +59,6 @@ exports.createFeedback = async (req, res) => {
 
 exports.getAllFeedback = async (req, res) => {
   try {
-
-    // Step 1: Delete feedbacks where student_id is null
-    await Feedback.deleteMany({ student_id: null });
-
-    // Step 2: Get all valid student IDs
-    const students = await Student.find({}, "_id");
-    const validStudentIds = students.map(s => s._id);
-
-    // Step 3: Delete feedbacks with invalid student_id
-    await Feedback.deleteMany({
-      student_id: { $nin: validStudentIds }
-    });
-
 
     const feedbacks = await Feedback.find().populate("student_id", "name course");
 
@@ -163,4 +150,3 @@ exports.getFeedbackByStudent = async (req, res) => {
 //     res.status(500).json({ error: "Server error" });
 //   }
 // };
-

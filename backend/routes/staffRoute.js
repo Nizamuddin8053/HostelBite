@@ -11,20 +11,21 @@ const {
 
 
 const router = express.Router();
+const { isAdmin } = require("../middlewares/auth");
 
 // Create staff
-router.post("/",  createStaff);
+router.post("/", isAdmin, createStaff);
 
 // Get all staff
-router.get("/getAllStaff",  getAllStaff);
+router.get("/getAllStaff", isAdmin, getAllStaff);
 
 
 // Update staff
-router.put("/update-salary/:id",  updateStaffSalary);
+router.put("/update-salary/:id", isAdmin, updateStaffSalary);
 
 
 // Delete staff
-router.delete("/:id",  deleteStaff);
+router.delete("/:id", isAdmin, deleteStaff);
 
 
 

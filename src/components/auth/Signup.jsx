@@ -100,7 +100,7 @@ const SignupForm = () => {
 
     //  Password strength checker(regex)
     const isStrongPassword = (password) =>
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/.test(password);
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,72}$/.test(password);
 
 
 
@@ -151,12 +151,12 @@ const SignupForm = () => {
 
 
         try {
-            await axios.post(
+            const response = await axios.post(
                 `${process.env.REACT_APP_API_URL}/api/auth/signup`,
                 formData
             );
 
-            showToast("signup successfull", TOAST_TYPE.SUCCESS);
+            showToast(response.data.message, TOAST_TYPE.INFO);
 
             navigate("/login");
 
@@ -368,7 +368,6 @@ const SignupForm = () => {
                                 <option value="">Select role</option>
                                 <option value="student">Student</option>
                                 <option value="staff">Staff</option>
-                                <option value="admin">Admin</option>
                                 
                             </select>
                         </div>

@@ -8,23 +8,23 @@ const {
     deleteManagement
 } = require("../controllers/Management/managementController");
 
-// const {auth,isStudent, isAdmin}  = require("../middlewares/auth");
+const { isAdmin } = require("../middlewares/auth");
 
 const router = express.Router();
 
 // Create new management record
-router.post("/",  createManagement);
+router.post("/", isAdmin, createManagement);
 
 // Get all management records
-router.get("/", getAllManagement);
+router.get("/", isAdmin, getAllManagement);
 
 // Get management by ID
-router.get("/:id",  getManagementById);
+router.get("/:id", isAdmin, getManagementById);
 
 // Update management details
-router.put("/:id",updateManagement);
+router.put("/:id", isAdmin, updateManagement);
 
 // Delete management record
-router.delete("/:id", deleteManagement);
+router.delete("/:id", isAdmin, deleteManagement);
 
 module.exports = router;
