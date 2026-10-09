@@ -10,7 +10,6 @@ const {
 const { isAdmin } = require("../middlewares/auth");
 
 
-
 // unapprove staff
 router.get("/unapproved", isAdmin, getUnapprovedUser);
 
