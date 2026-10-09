@@ -18,6 +18,10 @@ const ManageStaffSalary = ({ role }) => {
         navigate("/update-staff-salary");
     }
 
+    const generateSalarySlipHandler = () => {
+        navigate("/generate-salary-slip");
+    };
+
 
 
     return (
@@ -41,7 +45,7 @@ const ManageStaffSalary = ({ role }) => {
                 <button onClick={getAllStaffHandler} className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
                     Get all staff
                 </button>
-                <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                <button onClick={generateSalarySlipHandler} className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
                     Generate Salary Slip
                 </button>
                 <button onClick={updateStaffSalaryHandler} className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">

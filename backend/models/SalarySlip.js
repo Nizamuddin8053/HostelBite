@@ -2,8 +2,8 @@ const mongoose = require("mongoose");
 
 const salarySlipSchema = new mongoose.Schema(
 {
-  forMonth: Date,
-  amount: Number,
+  forMonth: { type: Date, required: true },
+  amount: { type: Number, required: true, min: 0.01 },
   status: {
     type: String,
     enum: ["pending", "paid"],
@@ -16,6 +16,7 @@ const salarySlipSchema = new mongoose.Schema(
   staffId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Staff",
+    required: true,
   }
 },
 { timestamps: true }

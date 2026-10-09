@@ -27,11 +27,7 @@
 //         return info;
 //     }catch(error){
 //         console.log("error while sending emali , error is :" , error)
-//         return res.status(500).json({
-//             success: false,
-//             message: "errro while sending mail"
-//         })
-
+//         throw error;
 //     }
 // }
 
@@ -74,4 +70,3 @@ export const mailSender = async (title, email, body) => {
     throw error;
   }
 };
-

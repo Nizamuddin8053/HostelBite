@@ -18,12 +18,12 @@ const ComplaintNotification = () => {
                 <MessageSquare className="text-indigo-600 mr-2" />
                 <h2 className="text-lg font-semibold">Complaints & Notifications</h2>
             </div>
-            <p className="text-gray-600 mb-3">Submit and view your complaints or feedback.</p>
+            <p className="text-gray-600 mb-3">View student complaints and management notifications.</p>
             <div className="flex gap-3">
                 <button onClick={complaintHandler} className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
                     View Complaints
                 </button>
-                <button onClick={viewNotificationHandler} className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                <button onClick={viewNotificationHandler} className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
                     View Notifications
                 </button>
             </div>

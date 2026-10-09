@@ -78,6 +78,20 @@ exports.getAllStaff = async (req, res) => {
   }
 };
 
+exports.getMyStaffProfile = async (req, res) => {
+  try {
+    const staff = await Staff.findById(req.user.id).select("name role email salaryAmount");
+
+    if (!staff) {
+      return res.status(404).json({ error: "Staff profile not found" });
+    }
+
+    res.status(200).json(staff);
+  } catch (err) {
+    console.error("Error fetching staff profile:", err);
+    res.status(500).json({ error: "Unable to fetch staff profile" });
+  }
+};
 
 
 

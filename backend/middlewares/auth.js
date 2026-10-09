@@ -58,6 +58,7 @@ exports.isStudent = exports.authorize("student");
 exports.isStaff = exports.authorize("staff");
 exports.isAdmin = exports.authorize("admin");
 exports.isStaffOrAdmin = exports.authorize("staff", "admin");
+exports.isStudentOrStaff = exports.authorize("student", "staff");
 
 exports.isSelfOrAdmin = (parameter, roleParameter, selfRole) => (req, res, next) => {
     const isSelf =

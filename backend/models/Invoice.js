@@ -18,6 +18,18 @@ const invoiceSchema = new mongoose.Schema({
         type: String,
         enum: ["paid", "unpaid"],
         default: "unpaid"
+    },
+    payment_id: {
+        type: String,
+        default: null
+    },
+    payment_order_id: {
+        type: String,
+        default: null
+    },
+    paid_at: {
+        type: Date,
+        default: null
     }
 }, { timestamps: true });
 

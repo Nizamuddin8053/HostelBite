@@ -168,64 +168,47 @@ Students, staff, and administrators can access the relevant features at `/api/st
 
 <h3>Home Page</h3>
 
-<img width="900" height="450" alt="home1" src="https://github.com/user-attachments/assets/e1ccdd5d-4ecb-41ef-8f15-f0bede548e74" />
-
-<img width="900" height="450" alt="home2" src="https://github.com/user-attachments/assets/813bac23-d642-45cb-a59a-f96f1206c4b6" />
-
-<img width="900" height="450" alt="home3" src="https://github.com/user-attachments/assets/0f50c329-dcdf-4dfd-bc3a-d0f061b79ef5" />
 
 <h3>About Page</h3>
 
-<img width="900" height="450" alt="about1" src="https://github.com/user-attachments/assets/57d74674-6834-47c3-8514-383373d7aca6" />
 
-<img width="900" height="450" alt="about2" src="https://github.com/user-attachments/assets/4c68f7bc-2aaf-4293-8478-0cc5de10cd1c" />
-
-<img width="900" height="450" alt="about3" src="https://github.com/user-attachments/assets/e3f6dca5-9744-4ac1-885a-a76361026199" />
 
 <h3>Service Page</h3>
 
-<img width="900" height="450" alt="service1" src="https://github.com/user-attachments/assets/1d992176-c5c9-4725-9614-0a0ddbcf4e53" />
-
-<img width="900" height="450" alt="service2" src="https://github.com/user-attachments/assets/f8c835bd-e05b-45cb-a08f-77793c02c7a6" />
-
-<img width="900" height="450" alt="service3" src="https://github.com/user-attachments/assets/31496e47-f7eb-418e-89dd-540e27b3d92b" />
 
 <h3>Contact Page</h3>
 
-<img width="900" height="450" alt="contact1" src="https://github.com/user-attachments/assets/b4e2c925-8938-4fad-b73f-be1d9227c7b5" />
 
-<img width="900" height="450" alt="contact2" src="https://github.com/user-attachments/assets/2a70e5e1-6b6f-4ae6-8361-295e66c706aa" />
 
 <h3>SignUp Page</h3>
 
-<img width="900" height="450" alt="signup" src="https://github.com/user-attachments/assets/dd0f20d4-2fa7-459e-b2c5-42be8fc0f37d" />
+
 
 <h3>Login Page</h3>
 
-<img width="900" height="450" alt="login" src="https://github.com/user-attachments/assets/1a8eb314-e487-4e3a-9e84-292664ead5a3" />
+
 
 <h3>Student Panel</h3>
 
-<img width="900" height="450" alt="student panel" src="https://github.com/user-attachments/assets/5bdb526e-0780-48f1-930c-6e4160fadecf" />
+
 
 <h3>Admin Panel</h3>
 
-<img width="900" height="450" alt="admin panel" src="https://github.com/user-attachments/assets/45cc39b1-b84b-4222-9317-28aedfbe2dd8" />
+
 
 <h3>Staff Panel</h3>
 
-<img width="900" height="450" alt="staff panel" src="https://github.com/user-attachments/assets/51228401-70cc-4842-a47d-9da4cdae2947" />
+
 
 <h3>Send Notification Page</h3>
 
-<img width="900" height="450" alt="send notification" src="https://github.com/user-attachments/assets/d632d5cc-aa7e-4f68-b4db-cc7ff9d494fa" />
+
 
 <h3>Add expense Page</h3>
-<img width="503" height="634" alt="add expense" src="https://github.com/user-attachments/assets/d3e6ef64-6bb1-4110-b102-0947a4c1201c" />
+
 
 <h3>Submit complaint page</h3>
 
-<img width="492" height="425" alt="submit complaint" src="https://github.com/user-attachments/assets/6cb15dd0-1e09-4c37-bee0-5e22000d6cc6" />
 
 
 

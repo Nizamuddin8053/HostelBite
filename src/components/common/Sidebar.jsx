@@ -22,9 +22,10 @@ const Sidebar = ({ role }) => {
 
     const staffLinks = [
         { label: "Salary", icon: FileSpreadsheet, path: "/staff-dashboard/salary-section" },
-        { label: "Feedback & Attendance", icon: Book, path: "/staff-dashboard/feedback-section" },
-        { label: "Complaints & Notifications", icon: FileText, path: "/staff-dashboard/complaints-section" },
         { label: "Menu", icon: Utensils, path: "/staff-dashboard/menu-section" },
+        { label: "Attendance", icon: Book, path: "/staff-dashboard/feedback-section" },
+        { label: "Complaints & Notifications", icon: FileText, path: "/staff-dashboard/complaints-section" },
+        
     ];
 
     const adminLinks = [

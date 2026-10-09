@@ -11,7 +11,7 @@ const {
 
 
 const router = express.Router();
-const { isAdmin, isSelfOrAdmin, isStudent } = require("../middlewares/auth");
+const { isAdmin, isSelfOrAdmin, isStudentOrStaff } = require("../middlewares/auth");
 
 // Create new notification
 router.post("/createNotification", isAdmin, createNotification);
@@ -23,7 +23,7 @@ router.get("/", isAdmin, getAllNotifications);
 router.get("/:userId/:role", isSelfOrAdmin("userId", "role"), getNotificationsByUser);
 
 // Mark notification as read
-router.put("/:id/read", isStudent, markAsRead);
+router.put("/:id/read", isStudentOrStaff, markAsRead);
 
 // Delete notification
 router.delete("/:id", isAdmin, deleteNotification);

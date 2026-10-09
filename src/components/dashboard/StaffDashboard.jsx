@@ -5,14 +5,14 @@ import NotificationSection from "../staff/ComplaintNotification";
 import MenuSection from "../common/MenuSection";
 import FeedbackSection from "../staff/FeedbackAttendance";
 
-const StaffDashboard =()=> {
+const StaffDashboard =({ staffId })=> {
     return (
         <div className="flex min-h-screen bg-gray-100">
             
             <div className="flex-1 flex flex-col">
 
                 <div className="p-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    <SalarySection />
+                    <SalarySection staffId={staffId} />
                     <MenuSection />
                     <FeedbackSection />
                     <NotificationSection />

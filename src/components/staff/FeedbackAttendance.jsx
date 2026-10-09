@@ -10,6 +10,9 @@ const FeedbackAttendance = () => {
         navigate("/feedback-list");
     }
 
+    const viewAttendanceHandler = () => {
+        navigate("/staff-dashboard/attendance");
+    };
 
     return (
         <div className="bg-white p-5 rounded-2xl shadow-md">
@@ -27,7 +30,7 @@ const FeedbackAttendance = () => {
                 <button onClick={ViewAllFeedbackHandler} className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
                     View Feedback
                 </button>
-                <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                <button onClick={viewAttendanceHandler} className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
                     View Attendance
                 </button>
             </div>

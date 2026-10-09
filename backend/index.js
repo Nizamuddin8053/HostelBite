@@ -1,3 +1,5 @@
+require("dotenv").config({ path: require("path").join(__dirname, ".env") });
+
 const express = require("express");
 const cors = require("cors");
 const connectDB= require("./config/Database");
@@ -24,8 +26,6 @@ const { auth } = require("./middlewares/auth");
 
 // const qrRoutes = require("./routes/qrRoutes");
 
-
-require("dotenv").config();
 
 const app = express();
 app.use(cors({

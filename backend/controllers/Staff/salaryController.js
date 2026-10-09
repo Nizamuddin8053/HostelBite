@@ -1,25 +1,56 @@
 const SalarySlip = require("../../models/SalarySlip");
+const Staff = require("../../models/Staff");
+const mongoose = require("mongoose");
 
 // Create salary record
 exports.createSalary = async (req, res) => {
   try {
-    const { staff_id, amount, month, status } = req.body;
+    const { staff_id, amount, month } = req.body;
 
-    if (!staff_id || !amount || !month) {
+    const salaryAmount = Number(amount);
+    if (
+      !staff_id ||
+      !mongoose.isValidObjectId(staff_id) ||
+      !Number.isFinite(salaryAmount) ||
+      salaryAmount <= 0 ||
+      typeof month !== "string" ||
+      !/^\d{4}-\d{2}$/.test(month)
+    ) {
       return res.status(400).json({
-        error: "Staff ID, amount, and month are required",
+        error: "A staff member, valid month, and positive salary amount are required",
       });
     }
 
+    const forMonth = new Date(`${month}-01T00:00:00.000Z`);
+    const [year, monthNumber] = month.split("-").map(Number);
+    if (
+      Number.isNaN(forMonth.getTime()) ||
+      monthNumber < 1 ||
+      monthNumber > 12 ||
+      forMonth.getUTCFullYear() !== year ||
+      forMonth.getUTCMonth() !== monthNumber - 1
+    ) {
+      return res.status(400).json({ error: "Enter a valid salary month" });
+    }
+
+    const staff = await Staff.findOne({ _id: staff_id, approved: true }).select("_id");
+    if (!staff) {
+      return res.status(404).json({ error: "Approved staff member not found" });
+    }
+
+    const existingSlip = await SalarySlip.findOne({ staffId: staff._id, forMonth });
+    if (existingSlip) {
+      return res.status(409).json({ error: "A salary slip already exists for this staff member and month" });
+    }
+
     const salary = await SalarySlip.create({
-      staffId: staff_id,
-      amount,
-      forMonth: new Date(month),
-      status: status || "pending",
+      staffId: staff._id,
+      amount: salaryAmount,
+      forMonth,
     });
 
     res.status(201).json({
-      message: "Salary record created successfully",
+      message: "Salary slip generated successfully",
       salaryId: salary._id,
     });
 
@@ -74,6 +105,7 @@ exports.getSalariesByStaff = async (req, res) => {
     const { staffId } = req.params;
 
     const salaries = await SalarySlip.find({ staffId })
+      .populate("staffId", "name role email")
       .sort({ createdAt: -1 });
 
     res.status(200).json(salaries);

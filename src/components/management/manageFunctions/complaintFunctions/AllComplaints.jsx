@@ -4,7 +4,7 @@ import showToast from "../../../../utils/showToast";
 import { TOAST_TYPE } from "../../../../utils/constants";
 
 
-const AllComplaints = () => {
+const AllComplaints = ({ role }) => {
     const [complaints, setComplaints] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -120,7 +120,7 @@ const AllComplaints = () => {
                                     </td>
 
                                     <td className="py-2 px-4 border-b">
-                                        {c.status === "Pending" && (
+                                        {role === "admin" && c.status === "Pending" && (
                                             <button
                                                 onClick={() => handleResolve(c.complaint_id)}
                                                 className="px-4 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white"

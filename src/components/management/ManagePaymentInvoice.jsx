@@ -10,6 +10,14 @@ const ManagePaymentInvoice = () => {
         navigate("/generate-invoice");
     }
 
+    const invoiceHistoryHandler = () => {
+        navigate("/admin-invoice-history?view=history");
+    }
+
+    const paymentStatusHandler = () => {
+        navigate("/admin-invoice-history?view=status");
+    }
+
     return (
         <div className="bg-white p-5 rounded-2xl shadow-md">
             <div className="flex items-center mb-3">
@@ -25,10 +33,10 @@ const ManagePaymentInvoice = () => {
                 <button onClick={generateInvoiceHandler} className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
                     Generate Invoice
                 </button>
-                <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                <button onClick={invoiceHistoryHandler} className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
                     View Invoice History
                 </button>
-                <button className="bg-green-600 text-whitepx-4 py-2 rounded-lg hover:bg-indigo-700">
+                <button onClick={paymentStatusHandler} className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
                     Track Payment Status
                 </button>
                

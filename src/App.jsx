@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import PrivateRoute from "./components/auth/PrivateRoute";
 import PublicRoute from "./components/auth/PublicRoute";
@@ -127,12 +127,15 @@ import SendNotification from "./components/management/manageFunctions/notificati
 // *********************************************************admin payment and invoice card functions****************************
 
 import GenerateInvoice from "./components/management/manageFunctions/paymentAndInvoice/GenerateInvoice";
+import AdminInvoiceHistory from "./components/management/manageFunctions/paymentAndInvoice/AdminInvoiceHistory";
 
 // ********************************************admin staff salary functions*****************************
 
 import ApproveStaff from "./components/management/manageFunctions/staffSalaryFunctions/ApproveStaff";
 import AllStaff from "./components/management/manageFunctions/staffSalaryFunctions/AllStaff";
 import UpdateStaffSalary from "./components/management/manageFunctions/staffSalaryFunctions/UpdateStaffSalary";
+import GenerateSalarySlip from "./components/management/manageFunctions/staffSalaryFunctions/GenerateSalarySlip";
+import StaffAttendance from "./components/staff/StaffAttendance";
 
 
 
@@ -152,6 +155,7 @@ import SalarySection from "./components/staff/SalarySection";
 
 function App() {
 
+  useLocation();
 
   const token = localStorage.getItem("token");
 
@@ -163,6 +167,10 @@ function App() {
       const decoded = jwtDecode(token);
       role = decoded.role;
       userId = decoded.id;
+
+      console.log("role is:", role);
+      console.log("userId is:", userId);
+
     } catch (error) {
       console.log("Invalid token");
     }
@@ -245,7 +253,7 @@ function App() {
           } />
           <Route path="/userNotification"
             element={
-              <PrivateRoute allowedRoles={[ACCOUNT_TYPE.STUDENT]}>
+              <PrivateRoute allowedRoles={[ACCOUNT_TYPE.STUDENT, ACCOUNT_TYPE.STAFF]}>
                 <UserNotifications userId={userId} role={role} />
               </PrivateRoute>
             } />
@@ -311,11 +319,12 @@ function App() {
               </PrivateRoute>
             }
           >
-            <Route index element={<StaffDashboard />} />
+            <Route index element={<StaffDashboard staffId={userId} />} />
             <Route path="menu-section" element={<MenuSection />} />
             <Route path="complaints-section" element={<ComplaintNotification />} />
             <Route path="feedback-section" element={<FeedbackAttendance />} />
-            <Route path="salary-section" element={<SalarySection />} />
+            <Route path="salary-section" element={<SalarySection staffId={userId} />} />
+            <Route path="attendance" element={<StaffAttendance />} />
           </Route>
 
 
@@ -428,8 +437,8 @@ function App() {
           {/* Complaints  */}
           <Route path="/all-complaints"
             element={
-              <PrivateRoute allowedRoles={[ACCOUNT_TYPE.ADMIN]}>
-                <AllComplaints />
+              <PrivateRoute allowedRoles={[ACCOUNT_TYPE.ADMIN, ACCOUNT_TYPE.STAFF]}>
+                <AllComplaints role={role} />
               </PrivateRoute>
             } />
 
@@ -472,6 +481,14 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/admin-invoice-history"
+            element={
+              <PrivateRoute allowedRoles={[ACCOUNT_TYPE.ADMIN]}>
+                <AdminInvoiceHistory />
+              </PrivateRoute>
+            }
+          />
 
 
           {/* staff salary  */}
@@ -499,6 +516,12 @@ function App() {
             element={
               <PrivateRoute allowedRoles={[ACCOUNT_TYPE.ADMIN]}>
                 <UpdateStaffSalary />
+              </PrivateRoute>
+            } />
+          <Route path="/generate-salary-slip"
+            element={
+              <PrivateRoute allowedRoles={[ACCOUNT_TYPE.ADMIN]}>
+                <GenerateSalarySlip />
               </PrivateRoute>
             } />
 

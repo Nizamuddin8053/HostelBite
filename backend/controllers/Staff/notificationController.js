@@ -1,10 +1,11 @@
 const Notification = require("../../models/Notification");
 const Student = require("../../models/Student");
+const Staff = require("../../models/Staff");
 
 // Create notification
 exports.createNotification = async (req, res) => {
   try {
-    const { targetType, student_id, course, year, title, message } = req.body;
+    const { targetType, student_id, staff_id, course, year, title, message } = req.body;
 
     if (!title || !message) {
       return res.status(400).json({
@@ -59,6 +60,28 @@ exports.createNotification = async (req, res) => {
 
       notifications = students.map((student) => ({
         student_id: student._id,
+        title,
+        message,
+      }));
+    }
+
+    else if (targetType === "singleStaff") {
+      if (!staff_id) {
+        return res.status(400).json({ error: "Staff ID is required" });
+      }
+
+      const staff = await Staff.findOne({ _id: staff_id, approved: true }, "_id");
+      if (!staff) {
+        return res.status(404).json({ error: "Approved staff member not found" });
+      }
+
+      notifications.push({ staff_id: staff._id, title, message });
+    }
+
+    else if (targetType === "allStaff") {
+      const staffMembers = await Staff.find({ approved: true }, "_id");
+      notifications = staffMembers.map((staff) => ({
+        staff_id: staff._id,
         title,
         message,
       }));
@@ -126,9 +149,10 @@ exports.getNotificationsByUser = async (req, res) => {
 exports.markAsRead = async (req, res) => {
   try {
     const { id } = req.params;
+    const recipientField = req.user.role === "staff" ? "staff_id" : "student_id";
 
     const updated = await Notification.findOneAndUpdate(
-      { _id: id, student_id: req.user.id },
+      { _id: id, [recipientField]: req.user.id },
       { $set: { isRead: true } },
       { new: true }
     );

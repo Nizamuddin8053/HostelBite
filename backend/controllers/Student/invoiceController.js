@@ -1,16 +1,18 @@
 const Invoice = require("../../models/Invoice");
 
 const Student = require("../../models/Student");
+const { mailSender } = require("../../utils/mailSender");
+const { invoiceCreatedTemplate } = require("../../mailTemplates/invoiceCreatedTemplate");
 
 // create invoice
 
 exports.createInvoice = async (req, res) => {
     try {
-        const { student_id, course, year, amount, due_date, status } = req.body;
+        const { student_id, course, year, amount, due_date } = req.body;
 
-        if (!amount || !due_date) {
+        if (!Number.isFinite(Number(amount)) || Number(amount) <= 0 || !due_date || Number.isNaN(Date.parse(due_date))) {
             return res.status(400).json({
-                error: "Amount and due date are required"
+                error: "A positive amount and valid due date are required"
             });
         }
 
@@ -54,15 +56,30 @@ exports.createInvoice = async (req, res) => {
         // Create invoices in bulk
         const invoices = students.map((student) => ({
             student_id: student._id,
-                amount,
-                due_date,
-                status: status || "unpaid"
+            amount: Number(amount),
+            due_date,
+            status: "unpaid"
         }));
 
         const createdInvoices = await Invoice.insertMany(invoices);
+        const emailResults = await Promise.allSettled(students.map((student) =>
+            mailSender(
+                "A new HostelBite invoice is due",
+                student.email,
+                invoiceCreatedTemplate({
+                    name: student.name,
+                    amount: Number(amount),
+                    dueDate: due_date
+                })
+            )
+        ));
+        const emailsSent = emailResults.filter((result) => result.status === "fulfilled").length;
+        const emailFailures = emailResults.length - emailsSent;
 
         res.status(201).json({
-            message: `Invoices created for ${createdInvoices.length} student(s)`,
+            message: `Invoices created for ${createdInvoices.length} student(s). ${emailsSent} email(s) sent${emailFailures ? `; ${emailFailures} email(s) failed` : ""}.`,
+            emailsSent,
+            emailFailures,
             invoices: createdInvoices
         });
 
@@ -85,6 +102,8 @@ exports.getAllInvoices = async (req, res) => {
             amount: inv.amount,
             due_date: inv.due_date,
             status: inv.status,
+            payment_id: inv.payment_id,
+            paid_at: inv.paid_at,
             created_at: inv.createdAt,
             student_name: inv.student_id?.name,
             student_email: inv.student_id?.email

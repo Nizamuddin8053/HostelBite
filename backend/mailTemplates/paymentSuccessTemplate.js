@@ -4,6 +4,14 @@ exports.paymentSuccessTemplate = ({
   name,
   amount,
 }) => {
+  const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (character) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  })[character]);
+
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -37,7 +45,7 @@ exports.paymentSuccessTemplate = ({
           <tr>
             <td>
               <p style="color:#555; font-size:14px;">
-                Hello <b>${name}</b>,<br/><br/>
+                Hello <b>${escapeHtml(name)}</b>,<br/><br/>
                 Your payment has been successfully processed. Thank you for using <b>HostelBite</b> 🎉
               </p>
             </td>
@@ -56,7 +64,7 @@ exports.paymentSuccessTemplate = ({
                 display:inline-block;
                 margin:20px 0;
               ">
-                ₹ ${amount}
+                ₹ ${escapeHtml(amount)}
               </div>
             </td>
           </tr>
@@ -70,14 +78,14 @@ exports.paymentSuccessTemplate = ({
 
                 <tr>
                   <td style="border-bottom:1px solid #eee;"><b>Payment ID</b></td>
-                  <td style="border-bottom:1px solid #eee;">${razorpay_payment_id}</td>
+                  <td style="border-bottom:1px solid #eee;">${escapeHtml(razorpay_payment_id)}</td>
                 </tr>
 
     
 
                 <tr>
                   <td style="border-bottom:1px solid #eee;"><b>Email</b></td>
-                  <td style="border-bottom:1px solid #eee;">${email}</td>
+                  <td style="border-bottom:1px solid #eee;">${escapeHtml(email)}</td>
                 </tr>
 
               </table>
